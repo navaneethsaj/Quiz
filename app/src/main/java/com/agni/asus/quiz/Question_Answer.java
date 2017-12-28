@@ -91,12 +91,14 @@ public class Question_Answer extends AppCompatActivity {
         next=findViewById(R.id.next);
         questionModelArrayList=new ArrayList<>();
 
-        new MyAsyncTask().execute(base_url);
-
-        previous.setEnabled(false);
 
         imageView=findViewById(R.id.q_mark_imgvw);
         imageView.setVisibility(View.VISIBLE);
+
+
+        previous.setEnabled(false);
+
+        new MyAsyncTask().execute(base_url);
 
         ArrayAdapter<CharSequence> spinnerAdapter=ArrayAdapter.createFromResource(this,R.array.category_arrays,android.R.layout.simple_spinner_item);
         spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -194,7 +196,7 @@ public class Question_Answer extends AppCompatActivity {
         protected void onPreExecute() {
             super.onPreExecute();
             question_no=0;
-            //imageView.setVisibility(View.INVISIBLE);
+            imageView.setVisibility(View.INVISIBLE);
             next.setEnabled(true);
             previous.setEnabled(false);
             questionModelArrayList.clear();
@@ -229,7 +231,7 @@ public class Question_Answer extends AppCompatActivity {
         @Override
         protected void onPostExecute(String s) {
             super.onPostExecute(s);
-            //imageView.setVisibility(View.VISIBLE);
+            imageView.setVisibility(View.VISIBLE);
             bookLoading.stop();
             bookLoading.setVisibility(View.GONE);
             avLoadingIndicatorView.hide();
