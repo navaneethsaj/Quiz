@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="category_arrays">
+        <item>Any Category</item>
+        <item>General Knowledge</item>
+        <item>Books</item>
+        <item>Film</item>
+        <item>Music</item>
+        <item>Music And Theatres</item>
+        <item>TV</item>
+        <item>Video Games</item>
+        <item>Board Games</item>
+        <item>Science &amp; Nature</item>
+        <item>Computers</item>
+        <item>Mathematics</item>
+        <item>Mythology</item>
+        <item>Sports</item>
+        <item>Geography</item>
+        <item>History</item>
+        <item>Politics</item>
+        <item>Art</item>
+        <item>Celebrities</item>
+        <item>Animals</item>
+        <item>Vehicles</item>
+        <item>Comics</item>
+        <item>Gadgets</item>
+        <item>Japanese Animie &amp; Manga</item>
+        <item>Cartoon &amp; Animations</item>
+    </string-array>
+</resources>
