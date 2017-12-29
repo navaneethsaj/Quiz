@@ -37,10 +37,10 @@ import okhttp3.Response;
 
 public class QuizActivity extends AppCompatActivity {
 
-    String a_pholder="A : ";
-    String b_pholder="B : ";
-    String c_pholder="C : ";
-    String d_pholder="D : ";
+    String a_pholder="";
+    String b_pholder="";
+    String c_pholder="";
+    String d_pholder="";
 
     Handler handler;
     Runnable runnable;
@@ -62,8 +62,10 @@ public class QuizActivity extends AppCompatActivity {
     HTextView cat,diff;
     Random random;
     ImageView imageView;
+    ImageView img1,img2,img3,img4;
     Spinner spinner1,spinner2;
     TextView question_view;
+    HTextView final_points;
     TextView optn1,optn2,optn3,optn4;
     SharedPreferences sharedPreferences;
     SharedPreferences.Editor editor;
@@ -87,6 +89,11 @@ public class QuizActivity extends AppCompatActivity {
         random=new Random();
         nxt_vw=findViewById(R.id.nxt_qst);
         bookLoading=findViewById(R.id.book_loading);
+        final_points=findViewById(R.id.display_current_score_final);
+        img1=findViewById(R.id.img1);
+        img2=findViewById(R.id.img2);
+        img3=findViewById(R.id.img3);
+        img4=findViewById(R.id.img4);
         imageView=findViewById(R.id.q_mark_imgvw);
         avLoadingIndicatorView=findViewById(R.id.loading_indicator);
         question_view=findViewById(R.id.question_view);
@@ -108,10 +115,15 @@ public class QuizActivity extends AppCompatActivity {
         title.setText("Quiz");
         //previous.setVisibility(View.INVISIBLE);
         next.setText("SKIP");
+        img1.setVisibility(View.INVISIBLE);
+        img2.setVisibility(View.INVISIBLE);
+        img3.setVisibility(View.INVISIBLE);
+        img4.setVisibility(View.INVISIBLE);
 
 
         avLoadingIndicatorView.setVisibility(View.VISIBLE);
         bookLoading.setVisibility(View.VISIBLE);
+        final_points.setVisibility(View.INVISIBLE);
 
         new MyAsyncTask().execute(base_url);
 
@@ -142,7 +154,36 @@ public class QuizActivity extends AppCompatActivity {
                     cat.animateText(questionModelArrayList.get(question_no).getCategory());
                     assignAnswers(question_no);
                 }
+                if (question_no==9){
+                    next.setText("FINISH");
+                }
                 if (question_no==10){
+                    next.setText("NEW ROUND");
+
+                    imageView.setVisibility(View.INVISIBLE);
+                    optn1.setVisibility(View.GONE);
+                    optn2.setVisibility(View.GONE);
+                    optn3.setVisibility(View.GONE);
+                    optn4.setVisibility(View.GONE);
+                    nxt_vw.setVisibility(View.GONE);
+                    next_qstn_in.setVisibility(View.GONE);
+
+                    img1.setVisibility(View.INVISIBLE);
+                    img2.setVisibility(View.INVISIBLE);
+                    img3.setVisibility(View.INVISIBLE);
+                    img4.setVisibility(View.INVISIBLE);
+                    question_view.setVisibility(View.INVISIBLE);
+
+                    cat.setVisibility(View.INVISIBLE);
+                    countAnimationTextView.setVisibility(View.INVISIBLE);
+
+                    diff.animateText("Well Done");
+
+                    final_points.setVisibility(View.VISIBLE);
+                    final_points.setAnimateType(HTextViewType.TYPER);
+                    final_points.animateText("Points Earned : "+current_score);
+                }
+                if (question_no==11){
                     request_url=new StringBuilder();
                     request_url.append(base_url).append(category_url).append(difficulty_url);
                     new MyAsyncTask().execute(request_url.toString());
@@ -232,6 +273,8 @@ public class QuizActivity extends AppCompatActivity {
             //previous.setEnabled(false);
             avLoadingIndicatorView.show();
             bookLoading.start();
+            final_points.setVisibility(View.INVISIBLE);
+            countAnimationTextView.setVisibility(View.INVISIBLE);
             avLoadingIndicatorView.setVisibility(View.VISIBLE);
             bookLoading.setVisibility(View.VISIBLE);
             next.setEnabled(false);
@@ -243,6 +286,11 @@ public class QuizActivity extends AppCompatActivity {
             optn4.setVisibility(View.GONE);
             nxt_vw.setVisibility(View.GONE);
             next_qstn_in.setVisibility(View.GONE);
+
+            img1.setVisibility(View.INVISIBLE);
+            img2.setVisibility(View.INVISIBLE);
+            img3.setVisibility(View.INVISIBLE);
+            img4.setVisibility(View.INVISIBLE);
         }
 
         @Override
@@ -269,20 +317,28 @@ public class QuizActivity extends AppCompatActivity {
         protected void onPostExecute(String s) {
             super.onPostExecute(s);
             avLoadingIndicatorView.hide();
+            countAnimationTextView.setVisibility(View.VISIBLE);
             avLoadingIndicatorView.setVisibility(View.GONE);
             bookLoading.stop();
             bookLoading.setVisibility(View.GONE);
             next.setEnabled(true);
 
             imageView.setVisibility(View.VISIBLE);
+            final_points.setVisibility(View.INVISIBLE);
             question_view.setVisibility(View.VISIBLE);
             optn1.setVisibility(View.VISIBLE);
             optn2.setVisibility(View.VISIBLE);
             optn3.setVisibility(View.VISIBLE);
             optn4.setVisibility(View.VISIBLE);
 
-            nxt_vw.setVisibility(View.VISIBLE);
-            next_qstn_in.setVisibility(View.VISIBLE);
+            nxt_vw.setVisibility(View.INVISIBLE);
+            next_qstn_in.setVisibility(View.INVISIBLE);
+
+            img1.setVisibility(View.VISIBLE);
+            img2.setVisibility(View.VISIBLE);
+            img3.setVisibility(View.VISIBLE);
+            img4.setVisibility(View.VISIBLE);
+
             //Toast.makeText(getApplicationContext(),json_response,Toast.LENGTH_LONG).show();
             try {
                 JSONObject jsonObject=new JSONObject(json_response);
@@ -328,7 +384,6 @@ public class QuizActivity extends AppCompatActivity {
         View.OnClickListener wrongClick=new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                next_qstn_in.setAnimationDuration(3000).countAnimation(3,0);
                 int score=Integer.valueOf(sharedPreferences.getString(score_key,""));
                 score-=4;
                 current_score-=4;
@@ -342,23 +397,31 @@ public class QuizActivity extends AppCompatActivity {
                 optn4.setEnabled(false);
                 next.setText("NEXT");
 
+                if (question_no==9){
+                    next.setText("FINISH");
+                }
+
                 runnable=new Runnable() {
                     @Override
                     public void run() {
                         next.performClick();
                     }
                 };
-                handler.postDelayed(runnable,3000);
 
                 next_qstn_in.setVisibility(View.VISIBLE);
                 nxt_vw.setVisibility(View.VISIBLE);
+
+                next_qstn_in.clearAnimation();
+                next_qstn_in.setAnimationDuration(3000).countAnimation(3,0);
+                handler.postDelayed(runnable,3000);
+
+
             }
         };
 
         View.OnClickListener correctClick=new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                next_qstn_in.setAnimationDuration(3000).countAnimation(3,0);
                 int score=Integer.valueOf(sharedPreferences.getString(score_key,""));
                 score+=10;
                 current_score+=10;
@@ -371,6 +434,9 @@ public class QuizActivity extends AppCompatActivity {
                 optn3.setEnabled(false);
                 optn4.setEnabled(false);
                 next.setText("NEXT");
+                if (question_no==9){
+                    next.setText("FINISH");
+                }
 
                 runnable=new Runnable() {
                     @Override
@@ -379,10 +445,14 @@ public class QuizActivity extends AppCompatActivity {
                     }
                 };
 
-                handler.postDelayed(runnable,3000);
-
                 next_qstn_in.setVisibility(View.VISIBLE);
                 nxt_vw.setVisibility(View.VISIBLE);
+
+                next_qstn_in.clearAnimation();
+                next_qstn_in.setAnimationDuration(3000).countAnimation(3,0);
+                handler.postDelayed(runnable,3000);
+
+
             }
         };
 
