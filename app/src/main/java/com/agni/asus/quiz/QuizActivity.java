@@ -11,6 +11,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -19,6 +20,8 @@ import com.daasuu.cat.CountAnimationTextView;
 import com.dd.processbutton.iml.ActionProcessButton;
 import com.hanks.htextview.HTextView;
 import com.hanks.htextview.HTextViewType;
+import com.victor.loading.book.BookLoading;
+import com.wang.avi.AVLoadingIndicatorView;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -52,10 +55,13 @@ public class QuizActivity extends AppCompatActivity {
     String difficulty_url="";
     int check1=0;
     int check2=0;
+    BookLoading bookLoading;
+    AVLoadingIndicatorView avLoadingIndicatorView;
     StringBuilder request_url;
-    TextView title;
+    TextView title,nxt_vw;
     HTextView cat,diff;
     Random random;
+    ImageView imageView;
     Spinner spinner1,spinner2;
     TextView question_view;
     TextView optn1,optn2,optn3,optn4;
@@ -79,7 +85,13 @@ public class QuizActivity extends AppCompatActivity {
 
         questionModelArrayList=new ArrayList<>();
         random=new Random();
+        nxt_vw=findViewById(R.id.nxt_qst);
+        bookLoading=findViewById(R.id.book_loading);
+        imageView=findViewById(R.id.q_mark_imgvw);
+        avLoadingIndicatorView=findViewById(R.id.loading_indicator);
         question_view=findViewById(R.id.question_view);
+        avLoadingIndicatorView.show();
+        bookLoading.start();
         title=findViewById(R.id.title_text);
         countAnimationTextView=findViewById(R.id.current_count);
         next_qstn_in=findViewById(R.id.next_qstn_in);
@@ -96,6 +108,10 @@ public class QuizActivity extends AppCompatActivity {
         title.setText("Quiz");
         //previous.setVisibility(View.INVISIBLE);
         next.setText("SKIP");
+
+
+        avLoadingIndicatorView.setVisibility(View.VISIBLE);
+        bookLoading.setVisibility(View.VISIBLE);
 
         new MyAsyncTask().execute(base_url);
 
@@ -116,6 +132,8 @@ public class QuizActivity extends AppCompatActivity {
                 optn2.setEnabled(true);
                 optn3.setEnabled(true);
                 optn4.setEnabled(true);
+                next_qstn_in.setVisibility(View.INVISIBLE);
+                nxt_vw.setVisibility(View.INVISIBLE);
           //      previous.setEnabled(true);
                 next.setText("SKIP");
                 if (question_no<10){
@@ -212,7 +230,19 @@ public class QuizActivity extends AppCompatActivity {
             questionModelArrayList.clear();
             question_no=0;
             //previous.setEnabled(false);
+            avLoadingIndicatorView.show();
+            bookLoading.start();
+            avLoadingIndicatorView.setVisibility(View.VISIBLE);
+            bookLoading.setVisibility(View.VISIBLE);
             next.setEnabled(false);
+            imageView.setVisibility(View.INVISIBLE);
+            question_view.setVisibility(View.INVISIBLE);
+            optn1.setVisibility(View.GONE);
+            optn2.setVisibility(View.GONE);
+            optn3.setVisibility(View.GONE);
+            optn4.setVisibility(View.GONE);
+            nxt_vw.setVisibility(View.GONE);
+            next_qstn_in.setVisibility(View.GONE);
         }
 
         @Override
@@ -238,7 +268,21 @@ public class QuizActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(String s) {
             super.onPostExecute(s);
+            avLoadingIndicatorView.hide();
+            avLoadingIndicatorView.setVisibility(View.GONE);
+            bookLoading.stop();
+            bookLoading.setVisibility(View.GONE);
             next.setEnabled(true);
+
+            imageView.setVisibility(View.VISIBLE);
+            question_view.setVisibility(View.VISIBLE);
+            optn1.setVisibility(View.VISIBLE);
+            optn2.setVisibility(View.VISIBLE);
+            optn3.setVisibility(View.VISIBLE);
+            optn4.setVisibility(View.VISIBLE);
+
+            nxt_vw.setVisibility(View.VISIBLE);
+            next_qstn_in.setVisibility(View.VISIBLE);
             //Toast.makeText(getApplicationContext(),json_response,Toast.LENGTH_LONG).show();
             try {
                 JSONObject jsonObject=new JSONObject(json_response);
@@ -305,6 +349,9 @@ public class QuizActivity extends AppCompatActivity {
                     }
                 };
                 handler.postDelayed(runnable,3000);
+
+                next_qstn_in.setVisibility(View.VISIBLE);
+                nxt_vw.setVisibility(View.VISIBLE);
             }
         };
 
@@ -325,12 +372,17 @@ public class QuizActivity extends AppCompatActivity {
                 optn4.setEnabled(false);
                 next.setText("NEXT");
 
-                handler.postDelayed(new Runnable() {
+                runnable=new Runnable() {
                     @Override
                     public void run() {
                         next.performClick();
                     }
-                },3000);
+                };
+
+                handler.postDelayed(runnable,3000);
+
+                next_qstn_in.setVisibility(View.VISIBLE);
+                nxt_vw.setVisibility(View.VISIBLE);
             }
         };
 

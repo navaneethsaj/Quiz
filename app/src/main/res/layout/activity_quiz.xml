@@ -127,12 +127,14 @@
             android:layout_height="match_parent"
             android:orientation="vertical"
             android:layout_weight="1">
+
             <TextView
-                android:gravity="center_horizontal"
+                android:id="@+id/nxt_qst"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:text="Next question in"
-                android:layout_weight="1"/>
+                android:layout_weight="1"
+                android:gravity="center_horizontal"
+                android:text="Next question in" />
             <com.daasuu.cat.CountAnimationTextView
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
@@ -160,5 +162,19 @@
             custom:pb_textError="Error"
             custom:pb_textProgress="Loading" />
     </LinearLayout>
+    <com.wang.avi.AVLoadingIndicatorView
+        android:id="@+id/loading_indicator"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_above="@+id/book_loading"
+        android:layout_centerHorizontal="true"
+        app:indicatorColor="@color/blue_normal"
+        app:indicatorName="BallPulseSyncIndicator" />
+    <com.victor.loading.book.BookLoading
+        android:id="@+id/book_loading"
+        android:layout_width="150dp"
+        android:layout_height="100dp"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"/>
 
 </RelativeLayout>
