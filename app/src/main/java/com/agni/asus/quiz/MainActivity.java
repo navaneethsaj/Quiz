@@ -80,12 +80,16 @@ public class MainActivity extends AppCompatActivity {
         quiz_start_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                editor.putString(score_key,"4550");
-                editor.commit();
                 Intent intent=new Intent(getApplicationContext(),QuizActivity.class);
                 startActivity(intent);
                 //score_counter.setAnimationDuration(1500).countAnimation(0,Integer.parseInt(sharedPreferences.getString(score_key,"")));
             }
         });
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        score_counter.setAnimationDuration(1500).countAnimation(0,Integer.parseInt(sharedPreferences.getString(score_key,"")));
     }
 }

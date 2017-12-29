@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">Quiz</string>
+    <string name="a_pholder">A : </string>
+    <string name="b_pholder">B : </string>
+    <string name="c_pholder">C : </string>
+    <string name="d_pholder">D : </string>
 </resources>

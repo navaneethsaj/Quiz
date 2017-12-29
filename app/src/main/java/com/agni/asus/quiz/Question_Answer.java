@@ -7,6 +7,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Html;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -162,6 +163,7 @@ public class Question_Answer extends AppCompatActivity {
                         difficulty_url="&difficulty=hard";
                         break;
                 }
+                Log.d("QASpinner2","executed");
                 request_url=new StringBuilder();
                 request_url.append(base_url).append(category_url).append(difficulty_url);
                 new MyAsyncTask().execute(request_url.toString());
@@ -181,6 +183,8 @@ public class Question_Answer extends AppCompatActivity {
                 }else {
                     category_url="&category="+Integer.toString(position+8);
                 }
+
+                Log.d("QASpinner1","executed");
                 request_url = new StringBuilder();
                 request_url.append(base_url).append(category_url).append(difficulty_url);
                 new MyAsyncTask().execute(request_url.toString());
