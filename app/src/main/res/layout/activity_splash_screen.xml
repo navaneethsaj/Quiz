@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.agni.asus.quiz.SplashScreen">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/loading_counter"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="15dp"
+        android:fontFamily="serif"
+        android:text="Loading"
+        android:textAppearance="@style/TextAppearance.AppCompat.Headline" />
+
+    <com.daasuu.cat.CountAnimationTextView
+        android:id="@+id/loading_counter"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="81dp"
+        android:fontFamily="serif"
+        android:text="100"
+        android:textAppearance="@style/TextAppearance.AppCompat.Headline" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/loading_counter"
+        android:layout_alignBottom="@+id/loading_counter"
+        android:layout_toEndOf="@+id/loading_counter"
+        android:fontFamily="serif"
+        android:text="%"
+        android:textAppearance="@style/TextAppearance.AppCompat.Headline" />
+</RelativeLayout>

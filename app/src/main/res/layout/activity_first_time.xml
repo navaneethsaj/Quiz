@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="25dp"
+    tools:context="com.agni.asus.quiz.FirstTime">
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_alignStart="@+id/editText"
+        android:layout_marginTop="140dp"
+        android:fontFamily="serif"
+        android:text="Enter Display name"
+        android:textAlignment="center"
+        android:textAppearance="@style/TextAppearance.AppCompat.Large.Inverse"
+        android:typeface="normal" />
+
+    <EditText
+        style="@style/Widget.AppCompat.EditText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/textView"
+        android:layout_marginTop="19dp"
+        android:fontFamily="serif"
+        android:singleLine="false"
+        android:textAppearance="@style/TextAppearance.AppCompat.Large.Inverse"
+        android:typeface="normal"
+        android:id="@+id/editText" />
+
+    <com.dd.processbutton.iml.ActionProcessButton
+        android:id="@+id/ok_btn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignStart="@+id/skip_btn"
+        android:layout_below="@+id/editText"
+        android:layout_marginTop="23dp"
+        android:fontFamily="serif"
+        android:text="OK"
+        android:textAppearance="@style/TextAppearance.AppCompat.Headline"
+        android:typeface="serif" />
+
+    <com.dd.processbutton.iml.ActionProcessButton
+        android:id="@+id/skip_btn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignStart="@+id/editText"
+        android:layout_below="@+id/ok_btn"
+        android:layout_marginTop="12dp"
+        android:fontFamily="serif"
+        android:text="SKIP"
+        android:textAppearance="@style/TextAppearance.AppCompat.Headline"
+        android:typeface="normal" />
+</RelativeLayout>

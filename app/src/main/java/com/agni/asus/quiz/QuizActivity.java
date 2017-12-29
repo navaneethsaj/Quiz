@@ -1,16 +1,14 @@
 package com.agni.asus.quiz;
 
-import android.content.SharedPreferences;
 import android.os.AsyncTask;
-import android.os.Handler;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Html;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -18,9 +16,6 @@ import android.widget.Toast;
 import com.dd.processbutton.iml.ActionProcessButton;
 import com.hanks.htextview.HTextView;
 import com.hanks.htextview.HTextViewType;
-import com.skyfishjy.library.RippleBackground;
-import com.victor.loading.book.BookLoading;
-import com.wang.avi.AVLoadingIndicatorView;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -28,102 +23,68 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Random;
 
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
-public class Question_Answer extends AppCompatActivity {
+public class QuizActivity extends AppCompatActivity {
+    String base_url="https://opentdb.com/api.php?amount=10&type=multiple";
+    ArrayList<QuestionModel> questionModelArrayList;
     int question_no=0;
     String json_response;
     String category_url="";
     String difficulty_url="";
     StringBuilder request_url;
-    String base_url="https://opentdb.com/api.php?amount=10";
-    ArrayList<QuestionModel> questionModelArrayList;
-    TextView question_view,answer_view;
-    BookLoading bookLoading;
-    RippleBackground rippleTitle;
-    TextView title_text;
-    Spinner spinner1,spinner2;
     HTextView cat,diff;
-    ImageView imageView,tick_imageview;
-    SharedPreferences sharedPreferences;
-    SharedPreferences.Editor editor;
-    AVLoadingIndicatorView avLoadingIndicatorView;
-    private static final String pref_key="my_pref";
-    private static final String score_key="score_key";
-    private static final String user="user_name";
-    ActionProcessButton previous,next;
+    Random random;
+    Spinner spinner1,spinner2;
+    TextView question_view;
+    TextView optn1,optn2,optn3,optn4;
+    ActionProcessButton next,previous;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_quiz);
         getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
         getSupportActionBar().setDisplayShowCustomEnabled(true);
         getSupportActionBar().setCustomView(R.layout.app_bar_layout_2);
         View view=getSupportActionBar().getCustomView();
 
-        //btn_category=view.findViewById(R.id.category_btn);
-        //btn_difficult=view.findViewById(R.id.difficulty_btn);
-
-        sharedPreferences=getSharedPreferences(pref_key,MODE_PRIVATE);
-        editor=sharedPreferences.edit();
-
-        request_url=new StringBuilder();
-
-        spinner1=(Spinner)view.findViewById(R.id.spinner);
-        spinner2=(Spinner)view.findViewById(R.id.spinner2);
-        title_text=view.findViewById(R.id.title_text);
-        rippleTitle=view.findViewById(R.id.ripple_view);
-        setContentView(R.layout.activity_question__answer);
-        question_view=findViewById(R.id.question_view);
-        answer_view=findViewById(R.id.answer_view);
-        previous=findViewById(R.id.previous);
-        imageView=findViewById(R.id.q_mark_imgvw);
-        imageView.setVisibility(View.VISIBLE);
-        tick_imageview=findViewById(R.id.tick_image);
-        tick_imageview.setVisibility(View.INVISIBLE);
-        cat=(HTextView)findViewById(R.id.category);
-        diff=(HTextView)findViewById(R.id.difficulty);
-        bookLoading=findViewById(R.id.book_loading);
-        avLoadingIndicatorView=findViewById(R.id.loading_indicator);
-        avLoadingIndicatorView.show();
-        question_view.setVisibility(View.GONE);
-        answer_view.setVisibility(View.GONE);
-        bookLoading.start();
-        title_text.setText("Q&A");
-        next=findViewById(R.id.next);
         questionModelArrayList=new ArrayList<>();
-
-
-
-        previous.setEnabled(false);
+        random=new Random();
+        question_view=findViewById(R.id.question_view);
+        next=findViewById(R.id.next);
+        previous=findViewById(R.id.previous);
+        optn1=findViewById(R.id.option1);
+        optn2=findViewById(R.id.option2);
+        optn3=findViewById(R.id.option3);
+        optn4=findViewById(R.id.option4);
+        cat=findViewById(R.id.category);
+        diff=findViewById(R.id.difficulty);
+        spinner1=view.findViewById(R.id.spinner);
+        spinner2=view.findViewById(R.id.spinner2);
 
         new MyAsyncTask().execute(base_url);
 
-        ArrayAdapter<CharSequence> spinnerAdapter=ArrayAdapter.createFromResource(this,R.array.category_arrays,android.R.layout.simple_spinner_item);
+        ArrayAdapter<CharSequence> spinnerAdapter=ArrayAdapter.createFromResource(getApplicationContext(),R.array.category_arrays,android.R.layout.simple_spinner_item);
         spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner1.setAdapter(spinnerAdapter);
 
-        ArrayAdapter<CharSequence> spinnerAdapter2=ArrayAdapter.createFromResource(this,R.array.difficulty_list,android.R.layout.simple_spinner_item);
+        ArrayAdapter<CharSequence> spinnerAdapter2=ArrayAdapter.createFromResource(getApplicationContext(),R.array.difficulty_list,android.R.layout.simple_spinner_item);
         spinnerAdapter2.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner2.setAdapter(spinnerAdapter2);
 
         next.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                previous.setEnabled(true);
                 question_no++;
-                if (question_no < 10) {
+                if (question_no<10){
                     question_view.setText(Html.fromHtml(questionModelArrayList.get(question_no).getQuestion())); //to render html symbols like &quot , &amp etc etc
-                    answer_view.setText(questionModelArrayList.get(question_no).getCorrect_answer());
                     diff.animateText("Difficulty : "+questionModelArrayList.get(question_no).getDifficulty());
                     cat.animateText(questionModelArrayList.get(question_no).getCategory());
-                }
-                if (question_no==10){
-                    request_url=new StringBuilder();
-                    request_url.append(base_url).append(category_url).append(difficulty_url);
-                    new MyAsyncTask().execute(request_url.toString());
+                    assignAnswers(question_no);
                 }
             }
         });
@@ -135,9 +96,9 @@ public class Question_Answer extends AppCompatActivity {
                 question_no--;
                 if (question_no>=0){
                     question_view.setText(Html.fromHtml(questionModelArrayList.get(question_no).getQuestion())); //to render html symbols like &quot , &amp etc etc
-                    answer_view.setText(questionModelArrayList.get(question_no).getCorrect_answer());
                     diff.animateText("Difficulty : "+questionModelArrayList.get(question_no).getDifficulty());
                     cat.animateText(questionModelArrayList.get(question_no).getCategory());
+                    assignAnswers(question_no);
                 }
                 if (question_no==0){
                     previous.setEnabled(false);
@@ -164,7 +125,8 @@ public class Question_Answer extends AppCompatActivity {
                 }
                 request_url=new StringBuilder();
                 request_url.append(base_url).append(category_url).append(difficulty_url);
-                new MyAsyncTask().execute(request_url.toString());
+                Log.d("Spinner1","checked");
+                //new MyAsyncTask().execute(request_url.toString());
             }
 
             @Override
@@ -183,7 +145,8 @@ public class Question_Answer extends AppCompatActivity {
                 }
                 request_url = new StringBuilder();
                 request_url.append(base_url).append(category_url).append(difficulty_url);
-                new MyAsyncTask().execute(request_url.toString());
+                Log.d("Spinner2","Checked");
+           //     new MyAsyncTask().execute(request_url.toString());
             }
 
             @Override
@@ -191,25 +154,14 @@ public class Question_Answer extends AppCompatActivity {
 
             }
         });
-
     }
-    public class MyAsyncTask extends AsyncTask<String,Void,String>{
+    public class MyAsyncTask extends AsyncTask<String,Void,String> {
 
         @Override
         protected void onPreExecute() {
+            Log.d("mysynctask :", "done");
             super.onPreExecute();
-            question_no=0;
-            tick_imageview.setVisibility(View.INVISIBLE);
-            imageView.setVisibility(View.INVISIBLE);
-            next.setEnabled(false);
-            previous.setEnabled(false);
             questionModelArrayList.clear();
-            bookLoading.start();
-            bookLoading.setVisibility(View.VISIBLE);
-            avLoadingIndicatorView.setVisibility(View.VISIBLE);
-            avLoadingIndicatorView.show();
-            answer_view.setVisibility(View.GONE);
-            question_view.setVisibility(View.GONE);
         }
 
         @Override
@@ -235,22 +187,11 @@ public class Question_Answer extends AppCompatActivity {
         @Override
         protected void onPostExecute(String s) {
             super.onPostExecute(s);
-            tick_imageview.setVisibility(View.VISIBLE);
-            imageView.setVisibility(View.VISIBLE);
-            bookLoading.stop();
-            next.setEnabled(true);
-            bookLoading.setVisibility(View.GONE);
-            avLoadingIndicatorView.hide();
-            avLoadingIndicatorView.setVisibility(View.INVISIBLE);
-            answer_view.setVisibility(View.VISIBLE);
-            question_view.setVisibility(View.VISIBLE);
-
-
             //Toast.makeText(getApplicationContext(),json_response,Toast.LENGTH_LONG).show();
             try {
                 JSONObject jsonObject=new JSONObject(json_response);
                 if (jsonObject.getString("response_code").equals("0")){
-                    Toast.makeText(getApplicationContext(),"Success",Toast.LENGTH_LONG).show();
+                    Toast.makeText(getApplicationContext(),"Success",Toast.LENGTH_SHORT).show();
                     JSONArray jsonArray=jsonObject.getJSONArray("results");
                     for (int i=0;i<jsonArray.length();++i){
                         ArrayList<String> incorrect_ans=new ArrayList<>();
@@ -267,12 +208,12 @@ public class Question_Answer extends AppCompatActivity {
                     }
 
                     question_view.setText(Html.fromHtml(questionModelArrayList.get(0).getQuestion())); //to render html symbols like &quot , &amp etc etc
-                    answer_view.setText(questionModelArrayList.get(0).getCorrect_answer());
-
                     cat.setAnimateType(HTextViewType.EVAPORATE);
                     diff.setAnimateType(HTextViewType.EVAPORATE);
                     diff.animateText("Difficulty : "+questionModelArrayList.get(0).getDifficulty());
                     cat.animateText(questionModelArrayList.get(0).getCategory());
+
+                    assignAnswers(0);
 
                 }else {
                     Toast.makeText(getApplicationContext(),"Server Error",Toast.LENGTH_LONG).show();
@@ -281,6 +222,66 @@ public class Question_Answer extends AppCompatActivity {
                 e.printStackTrace();
             }
 
+        }
+    }
+
+    private void assignAnswers(int i) {
+        Log.d("assignanswer" ," executed");
+        int pos=random.nextInt(4);
+        optn1.setOnClickListener(null);
+        optn2.setOnClickListener(null);
+        optn3.setOnClickListener(null);
+        optn4.setOnClickListener(null);
+        switch (pos){
+            case 0:
+                optn1.setText(Html.fromHtml(questionModelArrayList.get(i).getCorrect_answer())+" tick");
+                optn1.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Toast.makeText(getApplicationContext(),"COrrect",Toast.LENGTH_SHORT).show();
+                    }
+                });
+                optn2.setText(Html.fromHtml(questionModelArrayList.get(i).getIncorrect_answers().get(0)));
+                optn3.setText(Html.fromHtml(questionModelArrayList.get(i).getIncorrect_answers().get(1)));
+                optn4.setText(Html.fromHtml(questionModelArrayList.get(i).getIncorrect_answers().get(2)));
+
+                break;
+            case 1:
+                optn2.setText(Html.fromHtml(questionModelArrayList.get(i).getCorrect_answer())+" tick");
+                optn2.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Toast.makeText(getApplicationContext(),"COrrect",Toast.LENGTH_SHORT).show();
+                    }
+                });
+                optn1.setText(Html.fromHtml(questionModelArrayList.get(i).getIncorrect_answers().get(0)));
+                optn3.setText(Html.fromHtml(questionModelArrayList.get(i).getIncorrect_answers().get(1)));
+                optn4.setText(Html.fromHtml(questionModelArrayList.get(i).getIncorrect_answers().get(2)));
+                break;
+            case 2:
+                optn3.setText(Html.fromHtml(questionModelArrayList.get(i).getCorrect_answer())+" tick");
+                optn3.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Toast.makeText(getApplicationContext(),"COrrect",Toast.LENGTH_SHORT).show();
+                    }
+                });
+                optn1.setText(Html.fromHtml(questionModelArrayList.get(i).getIncorrect_answers().get(0)));
+                optn2.setText(Html.fromHtml(questionModelArrayList.get(i).getIncorrect_answers().get(1)));
+                optn4.setText(Html.fromHtml(questionModelArrayList.get(i).getIncorrect_answers().get(2)));
+                break;
+            case 3:
+                optn4.setText(Html.fromHtml(questionModelArrayList.get(i).getCorrect_answer())+" tick");
+                optn4.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Toast.makeText(getApplicationContext(),"COrrect",Toast.LENGTH_SHORT).show();
+                    }
+                });
+                optn1.setText(Html.fromHtml(questionModelArrayList.get(i).getIncorrect_answers().get(0)));
+                optn2.setText(Html.fromHtml(questionModelArrayList.get(i).getIncorrect_answers().get(1)));
+                optn3.setText(Html.fromHtml(questionModelArrayList.get(i).getIncorrect_answers().get(2)));
+                break;
         }
     }
 }

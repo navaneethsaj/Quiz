@@ -1,48 +1,42 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="?attr/actionBarSize"
+    android:orientation="vertical"
     xmlns:custom="http://schemas.android.com/apk/res-auto"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <LinearLayout
+    <TextView
+        android:id="@+id/title_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fontFamily="serif"
+        android:gravity="center"
+        android:text="Page Title"
+        android:layout_marginBottom="2dp"
+        android:textAppearance="@style/TextAppearance.AppCompat.Headline"
+        android:typeface="normal" />
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="horizontal">
 
         <Spinner
-            android:id="@+id/spinner"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_gravity="left"
-            android:layout_weight="1"
-            android:gravity="left"
-            android:popupBackground="@color/colorAccent"
-            android:textAlignment="gravity"></Spinner>
-        <TextView
-            android:id="@+id/title_text"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_alignParentStart="true"
-            android:layout_weight=".9"
-            android:layout_alignParentTop="true"
-            android:fontFamily="serif"
-            android:gravity="center"
-            android:hint="App Title"
             android:elevation="8dp"
-            android:textAppearance="@style/TextAppearance.AppCompat.Title"
-            android:textColor="@color/colorAccent"
-            android:textSize="30sp"
-            android:typeface="normal" />
+            android:id="@+id/spinner"
+            android:layout_width="140dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:spinnerMode="dialog"></Spinner>
 
         <Spinner
+            android:elevation="8dp"
             android:id="@+id/spinner2"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_gravity="right"
-            android:layout_weight="1"
-            android:gravity="right"
-            android:popupBackground="@color/colorAccent"
-            android:textAlignment="gravity"></Spinner>
-    </LinearLayout>
-</RelativeLayout>
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentTop="true"
+            android:spinnerMode="dialog"></Spinner>
+    </RelativeLayout>
+</LinearLayout>

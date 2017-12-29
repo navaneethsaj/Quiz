@@ -24,6 +24,7 @@ public class MainActivity extends AppCompatActivity {
     CountAnimationTextView score_counter;
     SharedPreferences sharedPreferences;
     SharedPreferences.Editor editor;
+    private static final String isfirsttime="isfirsttime";
     private static final String pref_key="my_pref";
     private static final String score_key="score_key";
     private static final String user="user_name";
@@ -48,10 +49,14 @@ public class MainActivity extends AppCompatActivity {
 
         sharedPreferences=getSharedPreferences(pref_key,MODE_PRIVATE);
         editor=sharedPreferences.edit();
-        editor.putString(score_key,score);
-        editor.putString(user,"USER");
+        //editor.putString(score_key,score);
+        //editor.putString(user,"USER");
         editor.commit();
 
+        score_counter.setAnimationDuration(1500).countAnimation(0,Integer.parseInt(sharedPreferences.getString(score_key,"")));
+        hTextView.setAnimateType(HTextViewType.TYPER);
+        hTextView.animateText("Welcome "+sharedPreferences.getString(user,""));
+        title_text.setText("HOME");
 
         rippleTitle.setOnTouchListener(new View.OnTouchListener() {
             @Override
@@ -72,9 +77,15 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        score_counter.setAnimationDuration(1500).countAnimation(0,Integer.parseInt(sharedPreferences.getString(score_key,"")));
-        hTextView.setAnimateType(HTextViewType.TYPER);
-        hTextView.animateText("Welcome "+sharedPreferences.getString(user,""));
-        title_text.setText("HOME");
+        quiz_start_btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                editor.putString(score_key,"4550");
+                editor.commit();
+                Intent intent=new Intent(getApplicationContext(),QuizActivity.class);
+                startActivity(intent);
+                //score_counter.setAnimationDuration(1500).countAnimation(0,Integer.parseInt(sharedPreferences.getString(score_key,"")));
+            }
+        });
     }
 }
