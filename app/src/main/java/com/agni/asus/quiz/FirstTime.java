@@ -2,6 +2,7 @@ package com.agni.asus.quiz;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -11,6 +12,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.dd.processbutton.iml.ActionProcessButton;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -29,6 +35,8 @@ public class FirstTime extends AppCompatActivity {
     SharedPreferences.Editor editor;
     FirebaseDatabase firebaseDatabase;
     DatabaseReference databaseReference,databaseReference_user;
+    private FirebaseAuth.AuthStateListener mauthStateListener;
+    private FirebaseAuth mAuth;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -43,6 +51,39 @@ public class FirstTime extends AppCompatActivity {
         firebaseDatabase = FirebaseDatabase.getInstance();
         databaseReference = firebaseDatabase.getReference("count");
         databaseReference_user= firebaseDatabase.getReference("users");
+
+        mAuth = FirebaseAuth.getInstance();
+        mauthStateListener = new FirebaseAuth.AuthStateListener() {
+            @Override
+            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+                FirebaseUser user = firebaseAuth.getCurrentUser();
+                if (user != null) {
+                    // User is signed in
+                    Log.d("tag", "onAuthStateChanged:signed_in:" + user.getUid());
+                } else {
+                    // User is signed out
+                    Log.d("tag", "onAuthStateChanged:signed_out");
+                }
+
+            }
+        };
+
+        if (mAuth.getCurrentUser() == null){
+            mAuth.signInAnonymously()
+                    .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                        @Override
+                        public void onComplete(@NonNull Task<AuthResult> task) {
+                            Log.d("mauth", "OnComplete : " +task.isSuccessful());
+                            if (!task.isSuccessful()) {
+                                Log.w("mauth", "Failed : ", task.getException());
+                                Toast.makeText(getApplicationContext(), "Authentication failed.", Toast.LENGTH_SHORT).show();
+                            }
+
+
+                        }
+                    });
+        }
+
 
         skip.setVisibility(View.GONE); // comment for skip option
 
@@ -123,5 +164,19 @@ public class FirstTime extends AppCompatActivity {
         databaseReference.child("registration").child("anonymous").setValue(Integer.toString(Integer.valueOf(count)+1));
         Log.d("CountZ",count);
         Log.d("IncCounter","called");
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        mAuth.addAuthStateListener(mauthStateListener);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if (mauthStateListener != null) {
+            mAuth.removeAuthStateListener(mauthStateListener);
+        }
     }
 }

@@ -3,6 +3,7 @@ package com.agni.asus.quiz;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
+import android.support.annotation.NonNull;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -14,6 +15,9 @@ import android.widget.Toast;
 
 import com.daasuu.cat.CountAnimationTextView;
 import com.dd.processbutton.iml.ActionProcessButton;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -49,6 +53,7 @@ public class MainActivity extends AppCompatActivity {
     private String score="100";
     FirebaseDatabase database;
     DatabaseReference databaseCountReference,databaseReference_user;
+    private FirebaseAuth.AuthStateListener mauthStateListener;
     private FirebaseAuth mAuth;
 
     @Override
@@ -62,8 +67,36 @@ public class MainActivity extends AppCompatActivity {
         View view=getSupportActionBar().getCustomView();
 
         mAuth = FirebaseAuth.getInstance();
-        FirebaseUser currentUser = mAuth.getCurrentUser();
-        updateUI(currentUser);
+        mauthStateListener = new FirebaseAuth.AuthStateListener() {
+            @Override
+            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+                FirebaseUser user = firebaseAuth.getCurrentUser();
+                if (user != null) {
+                    // User is signed in
+                    Log.d("tag", "onAuthStateChanged:signed_in:" + user.getUid());
+                } else {
+                    // User is signed out
+                    Log.d("tag", "onAuthStateChanged:signed_out");
+                }
+
+            }
+        };
+
+        if (mAuth.getCurrentUser() == null){
+            mAuth.signInAnonymously()
+                    .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                        @Override
+                        public void onComplete(@NonNull Task<AuthResult> task) {
+                            Log.d("mauth", "OnComplete : " +task.isSuccessful());
+                            if (!task.isSuccessful()) {
+                                Log.w("mauth", "Failed : ", task.getException());
+                                Toast.makeText(MainActivity.this, "Authentication failed.", Toast.LENGTH_SHORT).show();
+                            }
+
+
+                        }
+                    });
+        }
 
         title_text=view.findViewById(R.id.title_text);
         rippleTitle=view.findViewById(R.id.ripple_view);
@@ -132,10 +165,6 @@ public class MainActivity extends AppCompatActivity {
         databaseReference_user.child(sharedPreferences.getString(unique_id,"")).child("score").setValue(sharedPreferences.getString(score_key,""));
     }
 
-    private void updateUI(FirebaseUser currentUser) {
-
-    }
-
     private void incrementMainCount(DataSnapshot dataSnapshot) {
         String count=dataSnapshot.child("mainactivity").getValue().toString();
         Log.d("count",count);
@@ -146,6 +175,18 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         score_counter.setAnimationDuration(1500).countAnimation(0,Integer.parseInt(sharedPreferences.getString(score_key,"")));
+        databaseReference_user.child(sharedPreferences.getString(unique_id,"")).child("score").setValue(sharedPreferences.getString(score_key,""));
+        databaseCountReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                incrementMainCount(dataSnapshot);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
     }
 
     public class FireFunctionTriggerAsyncTask extends AsyncTask<String,Void,String>{
@@ -169,6 +210,20 @@ public class MainActivity extends AppCompatActivity {
         protected void onPostExecute(String s) {
             super.onPostExecute(s);
             Toast.makeText(getApplicationContext(),"Called",Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        mAuth.addAuthStateListener(mauthStateListener);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if (mauthStateListener != null) {
+            mAuth.removeAuthStateListener(mauthStateListener);
         }
     }
 }
