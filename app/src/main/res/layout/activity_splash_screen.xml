@@ -14,7 +14,8 @@
         android:layout_marginBottom="15dp"
         android:fontFamily="serif"
         android:text="Loading"
-        android:textAppearance="@style/TextAppearance.AppCompat.Headline" />
+        android:textAppearance="@style/TextAppearance.AppCompat.Headline"
+        android:id="@+id/textView2" />
 
     <com.daasuu.cat.CountAnimationTextView
         android:id="@+id/loading_counter"
@@ -36,4 +37,13 @@
         android:fontFamily="serif"
         android:text="%"
         android:textAppearance="@style/TextAppearance.AppCompat.Headline" />
+
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/textView2"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="64dp"
+        android:src="@drawable/icon" />
 </RelativeLayout>

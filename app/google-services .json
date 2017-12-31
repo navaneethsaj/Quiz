@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "513636539452",
+    "firebase_url": "https://quiz-72bee.firebaseio.com",
+    "project_id": "quiz-72bee",
+    "storage_bucket": "quiz-72bee.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:513636539452:android:926a38aeb9306e6f",
+        "android_client_info": {
+          "package_name": "com.agni.asus.quiz"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "513636539452-af25d3l2utrngvtpscvak9ga2tsovh61.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.agni.asus.quiz",
+            "certificate_hash": "b7f2dcf8046442d7d287a1f97eaadea8270835e4"
+          }
+        },
+        {
+          "client_id": "513636539452-rc2hf6lm5tes8bte3gmlm5968mj32e6r.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDNAnFUUenfOlLdCQRQ4Lm9LGniWGRwinE"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "513636539452-rc2hf6lm5tes8bte3gmlm5968mj32e6r.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -4,11 +4,18 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.dd.processbutton.iml.ActionProcessButton;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 public class FirstTime extends AppCompatActivity {
     SharedPreferences sharedPreferences;
@@ -18,7 +25,10 @@ public class FirstTime extends AppCompatActivity {
     private static final String pref_key="my_pref";
     private static final String isfirsttime="isfirsttime";
     private static final String user="user_name";
+    private static final String unique_id="unique_key";
     SharedPreferences.Editor editor;
+    FirebaseDatabase firebaseDatabase;
+    DatabaseReference databaseReference,databaseReference_user;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -29,15 +39,41 @@ public class FirstTime extends AppCompatActivity {
         editText=findViewById(R.id.editText);
         ok=findViewById(R.id.ok_btn);
         skip=findViewById(R.id.skip_btn);
+        setTitle("Welcome");
+        firebaseDatabase = FirebaseDatabase.getInstance();
+        databaseReference = firebaseDatabase.getReference("count");
+        databaseReference_user= firebaseDatabase.getReference("users");
+
+        skip.setVisibility(View.GONE); // comment for skip option
+
         ok.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent i = new Intent(FirstTime.this, MainActivity.class);
-                editor.putBoolean(isfirsttime,false);
-                editor.putString(user,editText.getText().toString());
-                editor.commit();
-                startActivity(i);
-                finish();
+                if (editText.getText().length()>2){
+                    Intent i = new Intent(FirstTime.this, MainActivity.class);
+                    editor.putBoolean(isfirsttime,false);
+                    editor.putString(user,editText.getText().toString());
+                    editor.commit();
+                    databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            incrementCount(dataSnapshot);
+                            registerUser(dataSnapshot);
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+
+                        }
+                    });
+                    Log.d("ok","called");
+                    startActivity(i);
+                    finish();
+                }else if (editText.getText().length()==0){
+                    Toast.makeText(getApplicationContext(),"Enter your Name or Nick Name",Toast.LENGTH_SHORT).show();
+                }else {
+                    Toast.makeText(getApplicationContext(),"Name should be atleast 3 letter in length",Toast.LENGTH_SHORT).show();
+                }
             }
         });
         skip.setOnClickListener(new View.OnClickListener() {
@@ -47,9 +83,45 @@ public class FirstTime extends AppCompatActivity {
                 editor.putBoolean(isfirsttime,false);
                 editor.putString(user,"User");
                 editor.commit();
+                Log.d("skip","Called");
+                databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        incrementCountSkip(dataSnapshot);
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
                 startActivity(i);
                 finish();
             }
         });
+    }
+
+    private void registerUser(DataSnapshot dataSnapshot) {
+        String unique_key=databaseReference_user.push().getKey();
+        //Toast.makeText(getApplicationContext(),unique_key,Toast.LENGTH_SHORT).show();
+        editor=sharedPreferences.edit();
+        editor.putString(unique_id,unique_key);
+        editor.commit();
+        //Toast.makeText(getApplicationContext(),sharedPreferences.getString(unique_id,""),Toast.LENGTH_SHORT).show();
+        databaseReference_user.child(unique_key).child("name").setValue(editText.getText().toString());
+    }
+
+    private void incrementCount(DataSnapshot dataSnapshot) {
+        String count=dataSnapshot.child("registration").child("registered").getValue().toString();
+        databaseReference.child("registration").child("registered").setValue(Integer.toString(Integer.valueOf(count)+1));
+        Log.d("CountZ",count);
+        Log.d("IncCounter","called");
+    }
+
+    private void incrementCountSkip(DataSnapshot dataSnapshot) {
+        String count=dataSnapshot.child("registration").child("anonymous").getValue().toString();
+        databaseReference.child("registration").child("anonymous").setValue(Integer.toString(Integer.valueOf(count)+1));
+        Log.d("CountZ",count);
+        Log.d("IncCounter","called");
     }
 }
