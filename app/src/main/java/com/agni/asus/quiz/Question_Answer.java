@@ -59,6 +59,8 @@ public class Question_Answer extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        overridePendingTransition(R.anim.slide_in_left,R.anim.slide_out_right);
+        setContentView(R.layout.activity_question__answer);
         getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
         getSupportActionBar().setDisplayShowCustomEnabled(true);
         getSupportActionBar().setCustomView(R.layout.app_bar_layout_2);
@@ -76,7 +78,6 @@ public class Question_Answer extends AppCompatActivity {
         spinner2=(Spinner)view.findViewById(R.id.spinner2);
         title_text=view.findViewById(R.id.title_text);
         rippleTitle=view.findViewById(R.id.ripple_view);
-        setContentView(R.layout.activity_question__answer);
         question_view=findViewById(R.id.question_view);
         answer_view=findViewById(R.id.answer_view);
         previous=findViewById(R.id.previous);
@@ -84,8 +85,8 @@ public class Question_Answer extends AppCompatActivity {
         imageView.setVisibility(View.VISIBLE);
         tick_imageview=findViewById(R.id.tick_image);
         tick_imageview.setVisibility(View.INVISIBLE);
-        cat=(HTextView)findViewById(R.id.category);
-        diff=(HTextView)findViewById(R.id.difficulty);
+        cat=(HTextView)view.findViewById(R.id.category);
+        diff=(HTextView)view.findViewById(R.id.difficulty);
         bookLoading=findViewById(R.id.book_loading);
         avLoadingIndicatorView=findViewById(R.id.loading_indicator);
         avLoadingIndicatorView.show();
@@ -103,11 +104,11 @@ public class Question_Answer extends AppCompatActivity {
         new MyAsyncTask().execute(base_url);
 
         ArrayAdapter<CharSequence> spinnerAdapter=ArrayAdapter.createFromResource(this,R.array.category_arrays,android.R.layout.simple_spinner_item);
-        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerAdapter.setDropDownViewResource(R.layout.spinner_layout);
         spinner1.setAdapter(spinnerAdapter);
 
         ArrayAdapter<CharSequence> spinnerAdapter2=ArrayAdapter.createFromResource(this,R.array.difficulty_list,android.R.layout.simple_spinner_item);
-        spinnerAdapter2.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerAdapter2.setDropDownViewResource(R.layout.spinner_layout);
         spinner2.setAdapter(spinnerAdapter2);
 
         next.setOnClickListener(new View.OnClickListener() {
@@ -286,5 +287,11 @@ public class Question_Answer extends AppCompatActivity {
             }
 
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        overridePendingTransition(R.anim.slide_in_right,R.anim.slide_out_left);
     }
 }

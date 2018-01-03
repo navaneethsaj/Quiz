@@ -12,19 +12,36 @@
         app:rb_rippleAmount="5"
         app:rb_duration="1500"
         app:rb_scale="6">
+
         <TextView
             android:id="@+id/title_text"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_above="@+id/textViewMyMessage"
             android:layout_alignParentStart="true"
-            android:layout_alignParentTop="true"
+            android:layout_marginBottom="24dp"
+            android:elevation="8dp"
             android:fontFamily="serif"
             android:gravity="center"
             android:hint="App Title"
-            android:elevation="8dp"
             android:textAppearance="@style/TextAppearance.AppCompat.Title"
-            android:textColor="@color/colorAccent"
+            android:textColor="@color/primary_text"
             android:textSize="30sp"
             android:typeface="normal" />
+
+        <TextView
+            android:id="@+id/textViewMyMessage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="30dp"
+            android:fontFamily="serif"
+            android:padding="10dp"
+            android:paddingBottom="15dp"
+            android:text="Knowledge is Power"
+            android:textAlignment="center"
+            android:textAppearance="@android:style/TextAppearance.Holo.Medium" />
     </com.skyfishjy.library.RippleBackground>
+
 </RelativeLayout>

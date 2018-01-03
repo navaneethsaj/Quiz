@@ -1,6 +1,8 @@
 package com.agni.asus.quiz;
 
+import android.annotation.SuppressLint;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.support.v7.app.ActionBar;
@@ -31,6 +33,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Random;
 
+import es.dmoral.toasty.Toasty;
+import nl.dionsegijn.konfetti.KonfettiView;
+import nl.dionsegijn.konfetti.models.Shape;
+import nl.dionsegijn.konfetti.models.Size;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -45,6 +51,7 @@ public class QuizActivity extends AppCompatActivity {
     Handler handler;
     Runnable runnable;
 
+    ImageView tick1,tick2,tick3,tick4;
     String base_url="https://opentdb.com/api.php?amount=10&type=multiple";
     private static final String pref_key="my_pref";
     private static final String score_key="score_key";
@@ -58,7 +65,7 @@ public class QuizActivity extends AppCompatActivity {
     BookLoading bookLoading;
     AVLoadingIndicatorView avLoadingIndicatorView;
     StringBuilder request_url;
-    TextView title,nxt_vw;
+    TextView title,nxt_vw,q_no;
     HTextView cat,diff;
     Random random;
     ImageView imageView;
@@ -71,15 +78,17 @@ public class QuizActivity extends AppCompatActivity {
     SharedPreferences.Editor editor;
     ActionProcessButton next;
     CountAnimationTextView countAnimationTextView,next_qstn_in;
+    KonfettiView konfettiView;
     int current_score=0;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        overridePendingTransition(R.anim.slide_in_right,R.anim.slide_out_left);
         setContentView(R.layout.activity_quiz);
         current_score=0;
         getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
         getSupportActionBar().setDisplayShowCustomEnabled(true);
-        getSupportActionBar().setCustomView(R.layout.app_bar_layout_2);
+        getSupportActionBar().setCustomView(R.layout.app_bar_layout_3);
         View view=getSupportActionBar().getCustomView();
         sharedPreferences=getSharedPreferences(pref_key,MODE_PRIVATE);
         editor=sharedPreferences.edit();
@@ -90,17 +99,27 @@ public class QuizActivity extends AppCompatActivity {
         nxt_vw=findViewById(R.id.nxt_qst);
         bookLoading=findViewById(R.id.book_loading);
         final_points=findViewById(R.id.display_current_score_final);
+        q_no=view.findViewById(R.id.question_no);
         img1=findViewById(R.id.img1);
         img2=findViewById(R.id.img2);
         img3=findViewById(R.id.img3);
         img4=findViewById(R.id.img4);
+        tick1=findViewById(R.id.tick1);
+        tick2=findViewById(R.id.tick2);
+        tick3=findViewById(R.id.tick3);
+        tick4=findViewById(R.id.tick4);
+        tick1.setVisibility(View.GONE);
+        tick2.setVisibility(View.GONE);
+        tick3.setVisibility(View.GONE);
+        tick4.setVisibility(View.GONE);
         imageView=findViewById(R.id.q_mark_imgvw);
         avLoadingIndicatorView=findViewById(R.id.loading_indicator);
         question_view=findViewById(R.id.question_view);
+        konfettiView=findViewById(R.id.viewKonfetti);
         avLoadingIndicatorView.show();
         bookLoading.start();
         title=findViewById(R.id.title_text);
-        countAnimationTextView=findViewById(R.id.current_count);
+        countAnimationTextView=view.findViewById(R.id.current_count);
         next_qstn_in=findViewById(R.id.next_qstn_in);
         next=findViewById(R.id.next);
         //previous=findViewById(R.id.previous);
@@ -108,8 +127,8 @@ public class QuizActivity extends AppCompatActivity {
         optn2=findViewById(R.id.option2);
         optn3=findViewById(R.id.option3);
         optn4=findViewById(R.id.option4);
-        cat=findViewById(R.id.category);
-        diff=findViewById(R.id.difficulty);
+        cat=view.findViewById(R.id.category);
+        diff=view.findViewById(R.id.difficulty);
         spinner1=view.findViewById(R.id.spinner);
         spinner2=view.findViewById(R.id.spinner2);
         title.setText("Quiz");
@@ -128,14 +147,15 @@ public class QuizActivity extends AppCompatActivity {
         new MyAsyncTask().execute(base_url);
 
         ArrayAdapter<CharSequence> spinnerAdapter=ArrayAdapter.createFromResource(getApplicationContext(),R.array.category_arrays,android.R.layout.simple_spinner_item);
-        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerAdapter.setDropDownViewResource(R.layout.spinner_layout);
         spinner1.setAdapter(spinnerAdapter);
 
         ArrayAdapter<CharSequence> spinnerAdapter2=ArrayAdapter.createFromResource(getApplicationContext(),R.array.difficulty_list,android.R.layout.simple_spinner_item);
-        spinnerAdapter2.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerAdapter2.setDropDownViewResource(R.layout.spinner_layout);
         spinner2.setAdapter(spinnerAdapter2);
 
         next.setOnClickListener(new View.OnClickListener() {
+            @SuppressLint("ResourceAsColor")
             @Override
             public void onClick(View v) {
                 handler.removeCallbacks(runnable);
@@ -144,6 +164,14 @@ public class QuizActivity extends AppCompatActivity {
                 optn2.setEnabled(true);
                 optn3.setEnabled(true);
                 optn4.setEnabled(true);
+                //optn1.setBackgroundColor(android.R.color.transparent);
+                //optn2.setBackgroundColor(android.R.color.transparent);
+                //optn3.setBackgroundColor(android.R.color.transparent);
+                //optn4.setBackgroundColor(android.R.color.transparent);
+                tick1.setVisibility(View.GONE);
+                tick2.setVisibility(View.GONE);
+                tick3.setVisibility(View.GONE);
+                tick4.setVisibility(View.GONE);
                 next_qstn_in.setVisibility(View.INVISIBLE);
                 nxt_vw.setVisibility(View.INVISIBLE);
           //      previous.setEnabled(true);
@@ -153,6 +181,7 @@ public class QuizActivity extends AppCompatActivity {
                     diff.animateText("Difficulty : "+questionModelArrayList.get(question_no).getDifficulty());
                     cat.animateText(questionModelArrayList.get(question_no).getCategory());
                     assignAnswers(question_no);
+                    q_no.setText("Q "+Integer.toString(question_no+1)+"/10");
                 }
                 if (question_no==9){
                     next.setText("FINISH");
@@ -177,11 +206,34 @@ public class QuizActivity extends AppCompatActivity {
                     cat.setVisibility(View.INVISIBLE);
                     countAnimationTextView.setVisibility(View.INVISIBLE);
 
-                    diff.animateText("Well Done");
+                    if (current_score<10){
+                        diff.animateText("Poor. Go to Q&A to practice.");
+                    }else if (current_score>=10 && current_score<30){
+                        diff.animateText("Below Average. Change difficulty from top right corner");
+                    }else if (current_score>=30 && current_score<60){
+                        diff.animateText("Good");
+                    }else if (current_score>=60 && current_score<80){
+                        diff.animateText("Well Done");
+                    }else if (current_score>=80){
+                        diff.animateText("Excellent Performance");
+                    }
 
                     final_points.setVisibility(View.VISIBLE);
                     final_points.setAnimateType(HTextViewType.TYPER);
                     final_points.animateText("Points Earned : "+current_score);
+
+                    if (current_score>10){
+                        konfettiView.build()
+                                .addColors(Color.YELLOW, Color.GREEN, Color.BLUE)
+                                .setDirection(0.0, 359.0)
+                                .setSpeed(1f, 5f)
+                                .setFadeOutEnabled(true)
+                                .setTimeToLive(2000L)
+                                .addShapes(Shape.RECT, Shape.CIRCLE)
+                                .addSizes(new Size(12,5))
+                                .setPosition(-50f, konfettiView.getWidth() + 50f, -50f, -50f)
+                                .stream(30, 5000L);
+                    }
                 }
                 if (question_no==11){
                     request_url=new StringBuilder();
@@ -267,9 +319,11 @@ public class QuizActivity extends AppCompatActivity {
         @Override
         protected void onPreExecute() {
             Log.d("mysynctask :", "done");
+            current_score=0;
             super.onPreExecute();
             questionModelArrayList.clear();
             question_no=0;
+            countAnimationTextView.countAnimation(0,0);
             //previous.setEnabled(false);
             avLoadingIndicatorView.show();
             bookLoading.start();
@@ -285,6 +339,7 @@ public class QuizActivity extends AppCompatActivity {
             optn3.setVisibility(View.GONE);
             optn4.setVisibility(View.GONE);
             nxt_vw.setVisibility(View.GONE);
+            next.setText("SKIP");
             next_qstn_in.setVisibility(View.GONE);
 
             img1.setVisibility(View.INVISIBLE);
@@ -332,7 +387,9 @@ public class QuizActivity extends AppCompatActivity {
             optn4.setVisibility(View.VISIBLE);
 
             nxt_vw.setVisibility(View.INVISIBLE);
+            next.setText("SKIP");
             next_qstn_in.setVisibility(View.INVISIBLE);
+            q_no.setText("Q 1/10");
 
             img1.setVisibility(View.VISIBLE);
             img2.setVisibility(View.VISIBLE);
@@ -343,7 +400,7 @@ public class QuizActivity extends AppCompatActivity {
             try {
                 JSONObject jsonObject=new JSONObject(json_response);
                 if (jsonObject.getString("response_code").equals("0")){
-                    Toast.makeText(getApplicationContext(),"Success",Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(getApplicationContext(),"Success",Toast.LENGTH_SHORT).show();
                     JSONArray jsonArray=jsonObject.getJSONArray("results");
                     for (int i=0;i<jsonArray.length();++i){
                         ArrayList<String> incorrect_ans=new ArrayList<>();
@@ -368,7 +425,7 @@ public class QuizActivity extends AppCompatActivity {
                     assignAnswers(0);
 
                 }else {
-                    Toast.makeText(getApplicationContext(),"Server Error",Toast.LENGTH_LONG).show();
+                    Toasty.warning(getApplicationContext(),"Server Error",Toast.LENGTH_SHORT,true).show();
                 }
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -377,9 +434,9 @@ public class QuizActivity extends AppCompatActivity {
         }
     }
 
-    private void assignAnswers(int i) {
+    private void assignAnswers(final int i) {
         Log.d("assignanswer" ," executed");
-        int pos=random.nextInt(4);
+        final int pos=random.nextInt(4);
 
         View.OnClickListener wrongClick=new View.OnClickListener() {
             @Override
@@ -390,7 +447,7 @@ public class QuizActivity extends AppCompatActivity {
                 countAnimationTextView.setAnimationDuration(500).countAnimation(current_score+4,current_score);
                 editor.putString(score_key,String.valueOf(score));
                 editor.commit();
-                Toast.makeText(getApplicationContext(),"Wrong",Toast.LENGTH_SHORT).show();
+                Toasty.error(getApplicationContext(),"Wrong",Toast.LENGTH_SHORT,true).show();
                 optn1.setEnabled(false);
                 optn2.setEnabled(false);
                 optn3.setEnabled(false);
@@ -408,6 +465,25 @@ public class QuizActivity extends AppCompatActivity {
                     }
                 };
 
+                switch (pos){
+                    case 0:
+                        //optn1.setBackgroundColor(getResources().getColor(R.color.correct_ans_bg));
+                        tick1.setVisibility(View.VISIBLE);
+                        break;
+                    case 1:
+                        //optn2.setBackgroundColor(getResources().getColor(R.color.correct_ans_bg));
+                        tick2.setVisibility(View.VISIBLE);
+                        break;
+                    case 2:
+                        //optn3.setBackgroundColor(getResources().getColor(R.color.correct_ans_bg));
+                        tick3.setVisibility(View.VISIBLE);
+                        break;
+                    case 3:
+                        //optn4.setBackgroundColor(getResources().getColor(R.color.correct_ans_bg));
+                        tick4.setVisibility(View.VISIBLE);
+                        break;
+                }
+
                 next_qstn_in.setVisibility(View.VISIBLE);
                 nxt_vw.setVisibility(View.VISIBLE);
 
@@ -423,12 +499,22 @@ public class QuizActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 int score=Integer.valueOf(sharedPreferences.getString(score_key,""));
-                score+=10;
-                current_score+=10;
+                if (questionModelArrayList.get(i).getDifficulty().equals("hard")){
+                    score+=15;
+                    current_score+=15;
+                }
+                if (questionModelArrayList.get(i).getDifficulty().equals("medium")){
+                    score+=10;
+                    current_score+=10;
+                }
+                if (questionModelArrayList.get(i).getDifficulty().equals("easy")){
+                    score+=5;
+                    current_score+=5;
+                }
                 countAnimationTextView.setAnimationDuration(500).countAnimation(current_score-10,current_score);
                 editor.putString(score_key,String.valueOf(score));
                 editor.commit();
-                Toast.makeText(getApplicationContext(),"COrrect",Toast.LENGTH_SHORT).show();
+                Toasty.success(getApplicationContext(),"Correct",Toast.LENGTH_SHORT,true).show();
                 optn1.setEnabled(false);
                 optn2.setEnabled(false);
                 optn3.setEnabled(false);
@@ -463,7 +549,7 @@ public class QuizActivity extends AppCompatActivity {
 
         switch (pos){
             case 0:
-                optn1.setText(a_pholder+Html.fromHtml(questionModelArrayList.get(i).getCorrect_answer())+" tick");
+                optn1.setText(a_pholder+Html.fromHtml(questionModelArrayList.get(i).getCorrect_answer()));
                 optn1.setOnClickListener(correctClick);
                 optn2.setText(b_pholder+Html.fromHtml(questionModelArrayList.get(i).getIncorrect_answers().get(0)));
                 optn3.setText(c_pholder+Html.fromHtml(questionModelArrayList.get(i).getIncorrect_answers().get(1)));
@@ -471,21 +557,21 @@ public class QuizActivity extends AppCompatActivity {
 
                 break;
             case 1:
-                optn2.setText(b_pholder+Html.fromHtml(questionModelArrayList.get(i).getCorrect_answer())+" tick");
+                optn2.setText(b_pholder+Html.fromHtml(questionModelArrayList.get(i).getCorrect_answer()));
                 optn2.setOnClickListener(correctClick);
                 optn1.setText(a_pholder+Html.fromHtml(questionModelArrayList.get(i).getIncorrect_answers().get(0)));
                 optn3.setText(c_pholder+Html.fromHtml(questionModelArrayList.get(i).getIncorrect_answers().get(1)));
                 optn4.setText(d_pholder+Html.fromHtml(questionModelArrayList.get(i).getIncorrect_answers().get(2)));
                 break;
             case 2:
-                optn3.setText(c_pholder+Html.fromHtml(questionModelArrayList.get(i).getCorrect_answer())+" tick");
+                optn3.setText(c_pholder+Html.fromHtml(questionModelArrayList.get(i).getCorrect_answer()));
                 optn3.setOnClickListener(correctClick);
                 optn1.setText(a_pholder+Html.fromHtml(questionModelArrayList.get(i).getIncorrect_answers().get(0)));
                 optn2.setText(b_pholder+Html.fromHtml(questionModelArrayList.get(i).getIncorrect_answers().get(1)));
                 optn4.setText(d_pholder+Html.fromHtml(questionModelArrayList.get(i).getIncorrect_answers().get(2)));
                 break;
             case 3:
-                optn4.setText(d_pholder+Html.fromHtml(questionModelArrayList.get(i).getCorrect_answer())+" tick");
+                optn4.setText(d_pholder+Html.fromHtml(questionModelArrayList.get(i).getCorrect_answer()));
                 optn4.setOnClickListener(correctClick);
                 optn1.setText(a_pholder+Html.fromHtml(questionModelArrayList.get(i).getIncorrect_answers().get(0)));
                 optn2.setText(b_pholder+Html.fromHtml(questionModelArrayList.get(i).getIncorrect_answers().get(1)));

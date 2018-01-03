@@ -21,12 +21,19 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingTop="20dp"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginBottom="20dp"
-        android:layout_marginVertical="10dp"
+
+
         android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/question_no"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:text="Q.no"
+            android:paddingBottom="10dp"/>
 
         <com.hanks.htextview.HTextView
             android:id="@+id/category"
@@ -43,6 +50,13 @@
             android:text="Difficulty"
             android:textAlignment="center"
             htext:animateType="typer" />
+
+        <com.daasuu.cat.CountAnimationTextView
+            android:id="@+id/current_count"
+            android:layout_width="match_parent"
+            android:layout_height="20dp"
+            android:text="0"
+            android:textAlignment="center" />
     </LinearLayout>
 
     <RelativeLayout
@@ -55,7 +69,7 @@
             android:layout_width="140dp"
             android:layout_height="wrap_content"
             android:layout_alignParentStart="true"
-            android:layout_alignTop="@+id/spinner2"
+            android:layout_alignParentTop="true"
             android:elevation="8dp"
             android:spinnerMode="dialog"></Spinner>
 
@@ -65,7 +79,6 @@
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
             android:layout_alignParentTop="true"
-            android:layout_marginTop="20dp"
             android:elevation="8dp"
             android:spinnerMode="dialog"></Spinner>
     </RelativeLayout>

@@ -1,5 +1,6 @@
 package com.agni.asus.quiz;
 
+import android.app.ActivityOptions;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
@@ -31,6 +32,8 @@ import com.hanks.htextview.HTextViewType;
 import com.skyfishjy.library.RippleBackground;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -39,7 +42,7 @@ import okhttp3.Response;
 
 public class MainActivity extends AppCompatActivity {
     RippleBackground rippleTitle;
-    TextView title_text;
+    TextView title_text,myMessage;
     HTextView hTextView;
     ActionProcessButton q_and_answer_btn,quiz_start_btn;
     CountAnimationTextView score_counter;
@@ -52,7 +55,7 @@ public class MainActivity extends AppCompatActivity {
     private static final String user="user_name";
     private String score="100";
     FirebaseDatabase database;
-    DatabaseReference databaseCountReference,databaseReference_user;
+    DatabaseReference databaseCountReference,databaseReference_user,databaseReference_mymessage;
     private FirebaseAuth.AuthStateListener mauthStateListener;
     private FirebaseAuth mAuth;
 
@@ -64,7 +67,7 @@ public class MainActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
         getSupportActionBar().setDisplayShowCustomEnabled(true);
         getSupportActionBar().setCustomView(R.layout.app_bar_layout);
-        View view=getSupportActionBar().getCustomView();
+        final View view=getSupportActionBar().getCustomView();
 
         mAuth = FirebaseAuth.getInstance();
         mauthStateListener = new FirebaseAuth.AuthStateListener() {
@@ -98,6 +101,7 @@ public class MainActivity extends AppCompatActivity {
                     });
         }
 
+        myMessage=view.findViewById(R.id.textViewMyMessage);
         title_text=view.findViewById(R.id.title_text);
         rippleTitle=view.findViewById(R.id.ripple_view);
         score_counter=(CountAnimationTextView)findViewById(R.id.score_counter);
@@ -116,10 +120,22 @@ public class MainActivity extends AppCompatActivity {
         database=FirebaseDatabase.getInstance();
         databaseCountReference=database.getReference("count");
         databaseReference_user=database.getReference("users");
+        databaseReference_mymessage=database.getReference("mymessage");
         databaseCountReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 incrementMainCount(dataSnapshot);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+        databaseReference_mymessage.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                myMessage.setText(dataSnapshot.getValue().toString());
             }
 
             @Override
@@ -162,7 +178,14 @@ public class MainActivity extends AppCompatActivity {
         });
 
         //new FireFunctionTriggerAsyncTask().execute("https://us-central1-quiz-72bee.cloudfunctions.net/helloWorld");
-        databaseReference_user.child(sharedPreferences.getString(unique_id,"")).child("score").setValue(sharedPreferences.getString(score_key,""));
+        if (sharedPreferences.getString(unique_id,"").length()>1){
+            databaseReference_user.child(sharedPreferences.getString(unique_id,"")).child("score").setValue(sharedPreferences.getString(score_key,""));
+            Calendar calander = Calendar.getInstance();
+            SimpleDateFormat simpledateformat = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+            String Date = simpledateformat.format(calander.getTime());
+            databaseReference_user.child(sharedPreferences.getString(unique_id,"")).child("log").push().setValue("Opened (onCreate) : "+Date);
+        }
+
     }
 
     private void incrementMainCount(DataSnapshot dataSnapshot) {
@@ -174,8 +197,14 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        if (FirebaseDatabase.getInstance() != null)
+        {
+            FirebaseDatabase.getInstance().goOnline();
+        }
         score_counter.setAnimationDuration(1500).countAnimation(0,Integer.parseInt(sharedPreferences.getString(score_key,"")));
-        databaseReference_user.child(sharedPreferences.getString(unique_id,"")).child("score").setValue(sharedPreferences.getString(score_key,""));
+        if (sharedPreferences.getString(unique_id,"").length()>1){
+            databaseReference_user.child(sharedPreferences.getString(unique_id,"")).child("score").setValue(sharedPreferences.getString(score_key,""));
+        }
         databaseCountReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -221,9 +250,32 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onStop() {
-        super.onStop();
         if (mauthStateListener != null) {
             mAuth.removeAuthStateListener(mauthStateListener);
         }
+        super.onStop();
     }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if(FirebaseDatabase.getInstance()!=null)
+        {
+            FirebaseDatabase.getInstance().goOffline();
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        Calendar calander = Calendar.getInstance();
+        SimpleDateFormat simpledateformat = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+        String Date = simpledateformat.format(calander.getTime());
+        if (sharedPreferences.getString(unique_id,"").length()>1){
+            databaseReference_user.child(sharedPreferences.getString(unique_id,"")).child("log").push().setValue("Closed(BackPressed) : "+Date);
+        }
+        finish();
+        super.onBackPressed();
+    }
+
+
 }
