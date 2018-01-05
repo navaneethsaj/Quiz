@@ -1,40 +1,110 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_margin="10dp">
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <TextView
+            android:id="@+id/textView3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="15dp"
+            android:background="@color/viewcolor"
+            android:elevation="4dp"
+            android:fontFamily="casual"
+            android:padding="10dp"
+            android:text="@string/description"
+            android:textStyle="bold" />
+        <LinearLayout
+            android:background="@color/viewcolor"
+            android:elevation="4dp"
+            android:layout_marginTop="20dp"
+            android:padding="5dp"
+            android:orientation="horizontal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+            <ImageView
+                android:id="@+id/imageView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_google_1632434" />
 
-    <TextView
-        android:id="@+id/textView3"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true"
-        android:layout_marginTop="32dp"
-        android:background="@color/viewcolor"
-        android:elevation="4dp"
-        android:fontFamily="casual"
-        android:padding="10dp"
-        android:text="@string/description"
-        android:textStyle="bold" />
+            <TextView
+                android:id="@+id/playstore"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/adamina"
+                android:paddingLeft="4dp"
+                android:text="Rate/Review us on Playstore"
+                android:textSize="18sp" />
+        </LinearLayout>
+        <LinearLayout
+            android:background="@color/viewcolor"
+            android:elevation="4dp"
+            android:layout_marginTop="20dp"
+            android:padding="10dp"
+            android:orientation="horizontal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+            <ImageView
+                android:id="@+id/imageView2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_social_2470866" />
 
-    <ImageView
-        android:id="@+id/imageView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentStart="true"
-        android:layout_marginBottom="149dp"
-        android:src="@drawable/ic_google_1632434" />
-
-    <TextView
-        android:id="@+id/playstore"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignTop="@+id/imageView"
-        android:layout_toEndOf="@+id/imageView"
-        android:fontFamily="@font/adamina"
-        android:text="Rate/Review us on Playstore"
-        android:textSize="18sp" />
-
-</RelativeLayout>
+            <TextView
+                android:id="@+id/facebook"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/adamina"
+                android:paddingLeft="4dp"
+                android:text="Like us on Facebook"
+                android:textSize="18sp" />
+        </LinearLayout>
+        <LinearLayout
+            android:background="@color/viewcolor"
+            android:layout_marginTop="30dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="5dp"
+            android:elevation="4dp"
+            android:orientation="vertical">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Credits"
+                android:fontFamily="casual"
+                android:layout_marginBottom="20dp"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="3dp"
+                android:fontFamily="casual"
+                android:text="Open Trivia DB" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="3dp"
+                android:fontFamily="casual"
+                android:text="OkHttp"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="3dp"
+                android:fontFamily="casual"
+                android:text="Firebase Realtime DB"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="3dp"
+                android:fontFamily="casual"
+                android:text="Pixabay"/>
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="20dp"></LinearLayout>
+    </LinearLayout>
+</ScrollView>

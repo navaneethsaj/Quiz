@@ -69,7 +69,7 @@ public class QuizActivity extends AppCompatActivity {
     private static final String score_key="score_key";
     ArrayList<QuestionModel> questionModelArrayList;
     int question_no=0;
-    String json_response;
+    String json_response=null;
     String category_url="";
     String difficulty_url="";
     int check1=0;

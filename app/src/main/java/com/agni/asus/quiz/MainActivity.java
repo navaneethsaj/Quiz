@@ -3,6 +3,7 @@ package com.agni.asus.quiz;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
@@ -50,7 +51,7 @@ public class MainActivity extends AppCompatActivity {
     CountAnimationTextView score_counter;
     SharedPreferences sharedPreferences;
     SharedPreferences.Editor editor;
-    TextView playstore;
+    TextView playstore,facebook;
     ImageView addQuestion,about,home;
     private static final String isfirsttime="isfirsttime";
     private static final String unique_id="unique_key";
@@ -58,6 +59,8 @@ public class MainActivity extends AppCompatActivity {
     private static final String score_key="score_key";
     private static final String user="user_name";
     int flag=0;
+    public static String FACEBOOK_URL = "https://www.facebook.com/98agni/";
+    public static String FACEBOOK_PAGE_ID = "AGNI";
     FirebaseDatabase database;
     String SHOWCASE_ID="998899";
     DatabaseReference databaseCountReference,databaseReference_user,databaseReference_mymessage;
@@ -219,6 +222,16 @@ public class MainActivity extends AppCompatActivity {
                         startActivity(intent);
                     }
                 });
+                facebook=findViewById(R.id.facebook);
+                facebook.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent facebookIntent = new Intent(Intent.ACTION_VIEW);
+                        String facebookUrl = getFacebookPageURL(getApplicationContext());
+                        facebookIntent.setData(Uri.parse(facebookUrl));
+                        startActivity(facebookIntent);
+                    }
+                });
             }
         });
 
@@ -349,4 +362,18 @@ public class MainActivity extends AppCompatActivity {
         }
         return haveConnectedWifi || haveConnectedMobile;
     }
+    public String getFacebookPageURL(Context context) {
+        PackageManager packageManager = context.getPackageManager();
+        try {
+            int versionCode = packageManager.getPackageInfo("com.facebook.katana", 0).versionCode;
+            if (versionCode >= 3002850) { //newer versions of fb app
+                return "fb://facewebmodal/f?href=" + FACEBOOK_URL;
+            } else { //older versions of fb app
+                return "fb://page/" + FACEBOOK_PAGE_ID;
+            }
+        } catch (PackageManager.NameNotFoundException e) {
+            return FACEBOOK_URL; //normal web url
+        }
+    }
+
 }
