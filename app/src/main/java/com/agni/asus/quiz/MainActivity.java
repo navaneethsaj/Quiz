@@ -264,11 +264,11 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onResume() {
-        super.onResume();
         if (FirebaseDatabase.getInstance() != null)
         {
             FirebaseDatabase.getInstance().goOnline();
         }
+        super.onResume();
         score_counter.setAnimationDuration(1500).countAnimation(0,Integer.parseInt(sharedPreferences.getString(score_key,"")));
         if (sharedPreferences.getString(unique_id,"").length()>1){
             databaseReference_user.child(sharedPreferences.getString(unique_id,"")).child("score").setValue(sharedPreferences.getString(score_key,""));
@@ -303,11 +303,11 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onPause() {
-        super.onPause();
         if(FirebaseDatabase.getInstance()!=null)
         {
             FirebaseDatabase.getInstance().goOffline();
         }
+        super.onPause();
     }
 
     @Override

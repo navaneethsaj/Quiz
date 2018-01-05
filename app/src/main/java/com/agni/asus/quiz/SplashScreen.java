@@ -30,7 +30,7 @@ public class SplashScreen extends AppCompatActivity {
         load_counter=findViewById(R.id.loading_counter);
         sharedPreferences=getSharedPreferences(pref_key,MODE_PRIVATE);
         editor=sharedPreferences.edit();
-        load_counter.setAnimationDuration(1600).countAnimation(0,100);
+        load_counter.setAnimationDuration(1100).countAnimation(0,100);
         new Handler().postDelayed(new Runnable() {
 
             @Override
@@ -54,7 +54,7 @@ public class SplashScreen extends AppCompatActivity {
                     overridePendingTransition(R.anim.zoom_in,R.anim.fadeout);
                 }
             }
-        }, 1700);
+        }, 1200);
     }
     private boolean haveNetworkConnection() {
         boolean haveConnectedWifi = false;

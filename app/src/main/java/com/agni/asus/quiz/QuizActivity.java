@@ -371,20 +371,20 @@ public class QuizActivity extends AppCompatActivity {
 
     @Override
     protected void onResume() {
-        super.onResume();
         if (FirebaseDatabase.getInstance() != null)
         {
             FirebaseDatabase.getInstance().goOnline();
         }
+        super.onResume();
     }
 
     @Override
     protected void onPause() {
-        super.onPause();
         if(FirebaseDatabase.getInstance()!=null)
         {
             FirebaseDatabase.getInstance().goOffline();
         }
+        super.onPause();
     }
 
     public class MyAsyncTask extends AsyncTask<String,Void,String> {
@@ -435,7 +435,11 @@ public class QuizActivity extends AppCompatActivity {
                 e.printStackTrace();
             }
             try {
-                json_response=response.body().string();  // directly stored in global variable
+                if (response != null) {
+                    json_response=response.body().string();  // directly stored in global variable
+                }
+            } catch (NullPointerException e) {
+                e.printStackTrace();
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -445,6 +449,11 @@ public class QuizActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(String s) {
             super.onPostExecute(s);
+
+            if (json_response==null){
+                Toasty.error(getApplicationContext(),"Server Error\nTry after some time",Toast.LENGTH_LONG,true).show();
+            }
+
             avLoadingIndicatorView.hide();
             countAnimationTextView.setVisibility(View.VISIBLE);
             avLoadingIndicatorView.setVisibility(View.GONE);

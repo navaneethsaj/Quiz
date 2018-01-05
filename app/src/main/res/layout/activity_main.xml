@@ -66,14 +66,14 @@
             fancy:fb_defaultColor="@color/button_normal"
             fancy:fb_borderColor="#FFFFFF"
             fancy:fb_borderWidth="1dp"
-            android:elevation="4dp"
+            android:elevation="2dp"
             fancy:fb_focusColor="@color/button_pressed"
             fancy:fb_radius="30dp"/>
         <mehdi.sakout.fancybuttons.FancyButton
             android:id="@+id/quiz_start"
             android:layout_weight="1"
             android:text="START QUIZ"
-            android:elevation="4dp"
+            android:elevation="2dp"
             android:layout_margin="5dp"
             android:textColor="@android:color/white"
             android:textSize="18sp"

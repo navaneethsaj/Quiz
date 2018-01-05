@@ -41,6 +41,7 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import es.dmoral.toasty.Toasty;
 import mehdi.sakout.fancybuttons.FancyButton;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -48,7 +49,7 @@ import okhttp3.Response;
 
 public class Question_Answer extends AppCompatActivity {
     int question_no=0;
-    String json_response;
+    String json_response=null;
     String category_url="";
     String difficulty_url="";
     StringBuilder request_url;
@@ -294,7 +295,9 @@ public class Question_Answer extends AppCompatActivity {
                 e.printStackTrace();
             }
             try {
-                json_response=response.body().string();  // directly stored in global variable
+                if (response != null) {
+                    json_response=response.body().string();  // directly stored in global variable
+                }
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -304,6 +307,9 @@ public class Question_Answer extends AppCompatActivity {
         @Override
         protected void onPostExecute(String s) {
             super.onPostExecute(s);
+            if (json_response==null){
+                Toasty.error(getApplicationContext(),"Server Error\nTry after some time",Toast.LENGTH_LONG,true).show();
+            }
             tick_imageview.setVisibility(View.VISIBLE);
             imageView.setVisibility(View.VISIBLE);
             viewGroup.setVisibility(View.VISIBLE);
@@ -366,20 +372,20 @@ public class Question_Answer extends AppCompatActivity {
     }
     @Override
     protected void onResume() {
-        super.onResume();
         if (FirebaseDatabase.getInstance() != null)
         {
             FirebaseDatabase.getInstance().goOnline();
         }
+        super.onResume();
     }
 
     @Override
     protected void onPause() {
-        super.onPause();
         if(FirebaseDatabase.getInstance()!=null)
         {
             FirebaseDatabase.getInstance().goOffline();
         }
+        super.onPause();
     }
 
 }

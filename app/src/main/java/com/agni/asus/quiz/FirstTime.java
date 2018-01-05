@@ -179,4 +179,22 @@ public class FirstTime extends AppCompatActivity {
             mAuth.removeAuthStateListener(mauthStateListener);
         }
     }
+
+    @Override
+    protected void onPause() {
+        if(FirebaseDatabase.getInstance()!=null)
+        {
+            FirebaseDatabase.getInstance().goOffline();
+        }
+        super.onPause();
+    }
+
+    @Override
+    protected void onResume() {
+        if (FirebaseDatabase.getInstance() != null)
+        {
+            FirebaseDatabase.getInstance().goOnline();
+        }
+        super.onResume();
+    }
 }
