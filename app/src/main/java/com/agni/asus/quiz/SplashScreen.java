@@ -45,7 +45,14 @@ public class SplashScreen extends AppCompatActivity {
                         startActivity(i);
                         finish();
                     }else {
-                        Toasty.error(getApplicationContext(),"No Internet Connection", Toast.LENGTH_LONG,true).show();
+                        Toasty.warning(getApplicationContext(),"No Internet Connection", Toast.LENGTH_SHORT,true).show();
+                        new Handler().postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toasty.warning(getApplicationContext(),"Exiting Application",Toast.LENGTH_SHORT,true).show();
+                                finish();
+                            }
+                        },1000);
                     }
                 }else {
                     Intent i = new Intent(SplashScreen.this, MainActivity.class);
