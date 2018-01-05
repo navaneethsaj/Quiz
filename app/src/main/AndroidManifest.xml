@@ -3,6 +3,7 @@
     package="com.agni.asus.quiz">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <application
         android:allowBackup="true"
@@ -26,6 +27,7 @@
             android:resource="@array/preloaded_fonts" />
 
         <activity android:name=".SplashScreen"
+            android:theme="@style/AppThemeSplashScreen"
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -34,6 +36,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".FirstTime"
+            android:theme="@style/AppThemeRegistration"
             android:screenOrientation="portrait"/>
         <activity android:name=".QuizActivity"
             android:screenOrientation="portrait"></activity>

@@ -1,17 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="?attr/actionBarSize"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
-    <com.skyfishjy.library.RippleBackground
-        android:id="@+id/ripple_view"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:rb_color="@color/colorPrimaryDark"
-        app:rb_radius="32dp"
-        app:rb_rippleAmount="5"
-        app:rb_duration="1500"
-        app:rb_scale="6">
+    android:layout_height="?attr/actionBarSize">
 
         <TextView
             android:id="@+id/title_text"
@@ -25,23 +15,48 @@
             android:gravity="center"
             android:hint="App Title"
             android:textAppearance="@style/TextAppearance.AppCompat.Title"
-            android:textColor="@color/primary_text"
+            android:textColor="#FFFFFF"
             android:textSize="30sp"
             android:typeface="normal" />
 
-        <TextView
-            android:id="@+id/textViewMyMessage"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_centerHorizontal="true"
-            android:layout_marginBottom="30dp"
-            android:fontFamily="serif"
-            android:padding="10dp"
-            android:paddingBottom="15dp"
-            android:text="Knowledge is Power"
-            android:textAlignment="center"
-            android:textAppearance="@android:style/TextAppearance.Holo.Medium" />
-    </com.skyfishjy.library.RippleBackground>
+    <TextView
+        android:id="@+id/textViewMyMessage"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginBottom="14dp"
+        android:fontFamily="serif"
+        android:padding="10dp"
+        android:paddingBottom="15dp"
+        android:text="Knowledge is Power"
+        android:textAlignment="center"
+        android:textAppearance="@android:style/TextAppearance.Holo.Medium"
+        android:textColor="#FFFFFF"
+        android:textSize="14sp" />
+
+    <ImageView
+        android:id="@+id/about"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_above="@+id/title_text"
+        android:layout_alignParentEnd="true"
+        android:src="@drawable/ic_question_answer_white_24px" />
+
+    <ImageView
+        android:id="@+id/home_image"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:layout_above="@+id/title_text"
+        android:layout_centerHorizontal="true"
+        android:src="@drawable/ic_home_white_18px" />
+
+    <ImageView
+        android:id="@+id/add_question"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/title_text"
+        android:layout_alignParentStart="true"
+        android:src="@drawable/ic_note_add_white_18px" />
 
 </RelativeLayout>

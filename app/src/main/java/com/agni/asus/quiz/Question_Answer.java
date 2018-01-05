@@ -3,12 +3,14 @@ package com.agni.asus.quiz;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Handler;
+import android.support.annotation.NonNull;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Html;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
@@ -16,7 +18,16 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.dd.processbutton.iml.ActionProcessButton;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.hanks.htextview.HTextView;
 import com.hanks.htextview.HTextViewType;
 import com.skyfishjy.library.RippleBackground;
@@ -30,6 +41,7 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import mehdi.sakout.fancybuttons.FancyButton;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -44,18 +56,22 @@ public class Question_Answer extends AppCompatActivity {
     ArrayList<QuestionModel> questionModelArrayList;
     TextView question_view,answer_view;
     BookLoading bookLoading;
-    RippleBackground rippleTitle;
     TextView title_text;
     Spinner spinner1,spinner2;
     HTextView cat,diff;
     ImageView imageView,tick_imageview;
     SharedPreferences sharedPreferences;
     SharedPreferences.Editor editor;
+    ViewGroup viewGroup;
+    DatabaseReference databaseCountReference;
+    FirebaseDatabase database;
+    private FirebaseAuth.AuthStateListener mauthStateListener;
+    private FirebaseAuth mAuth;
     AVLoadingIndicatorView avLoadingIndicatorView;
     private static final String pref_key="my_pref";
     private static final String score_key="score_key";
     private static final String user="user_name";
-    ActionProcessButton previous,next;
+    FancyButton previous,next;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -72,12 +88,48 @@ public class Question_Answer extends AppCompatActivity {
         sharedPreferences=getSharedPreferences(pref_key,MODE_PRIVATE);
         editor=sharedPreferences.edit();
 
+        mAuth = FirebaseAuth.getInstance();
+        mauthStateListener = new FirebaseAuth.AuthStateListener() {
+            @Override
+            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+                FirebaseUser user = firebaseAuth.getCurrentUser();
+                if (user != null) {
+                    // User is signed in
+                    Log.d("tag", "onAuthStateChanged:signed_in:" + user.getUid());
+                } else {
+                    // User is signed out
+                    Log.d("tag", "onAuthStateChanged:signed_out");
+                }
+
+            }
+        };
+
+        if (mAuth.getCurrentUser() == null){
+            mAuth.signInAnonymously()
+                    .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                        @Override
+                        public void onComplete(@NonNull Task<AuthResult> task) {
+                            Log.d("mauth", "OnComplete : " +task.isSuccessful());
+                            if (!task.isSuccessful()) {
+                                Log.w("mauth", "Failed : ", task.getException());
+                                Toast.makeText(getApplicationContext(), "Authentication failed.", Toast.LENGTH_SHORT).show();
+                            }
+
+
+                        }
+                    });
+        }
+
+        database=FirebaseDatabase.getInstance();
+        databaseCountReference=database.getReference("count");
+
+
         request_url=new StringBuilder();
 
+        viewGroup=findViewById(R.id.q_a_view);
         spinner1=(Spinner)view.findViewById(R.id.spinner);
         spinner2=(Spinner)view.findViewById(R.id.spinner2);
         title_text=view.findViewById(R.id.title_text);
-        rippleTitle=view.findViewById(R.id.ripple_view);
         question_view=findViewById(R.id.question_view);
         answer_view=findViewById(R.id.answer_view);
         previous=findViewById(R.id.previous);
@@ -203,6 +255,7 @@ public class Question_Answer extends AppCompatActivity {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
+            viewGroup.setVisibility(View.GONE);
             question_no=0;
             tick_imageview.setVisibility(View.INVISIBLE);
             imageView.setVisibility(View.INVISIBLE);
@@ -215,6 +268,17 @@ public class Question_Answer extends AppCompatActivity {
             avLoadingIndicatorView.show();
             answer_view.setVisibility(View.GONE);
             question_view.setVisibility(View.GONE);
+            databaseCountReference.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    incrementQAcount(dataSnapshot);
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            });
         }
 
         @Override
@@ -242,6 +306,7 @@ public class Question_Answer extends AppCompatActivity {
             super.onPostExecute(s);
             tick_imageview.setVisibility(View.VISIBLE);
             imageView.setVisibility(View.VISIBLE);
+            viewGroup.setVisibility(View.VISIBLE);
             bookLoading.stop();
             next.setEnabled(true);
             bookLoading.setVisibility(View.GONE);
@@ -250,12 +315,11 @@ public class Question_Answer extends AppCompatActivity {
             answer_view.setVisibility(View.VISIBLE);
             question_view.setVisibility(View.VISIBLE);
 
-
             //Toast.makeText(getApplicationContext(),json_response,Toast.LENGTH_LONG).show();
             try {
                 JSONObject jsonObject=new JSONObject(json_response);
                 if (jsonObject.getString("response_code").equals("0")){
-                    Toast.makeText(getApplicationContext(),"Success",Toast.LENGTH_LONG).show();
+                    //Toast.makeText(getApplicationContext(),"Success",Toast.LENGTH_LONG).show();
                     JSONArray jsonArray=jsonObject.getJSONArray("results");
                     for (int i=0;i<jsonArray.length();++i){
                         ArrayList<String> incorrect_ans=new ArrayList<>();
@@ -294,4 +358,28 @@ public class Question_Answer extends AppCompatActivity {
         super.onBackPressed();
         overridePendingTransition(R.anim.slide_in_right,R.anim.slide_out_left);
     }
+
+    private void incrementQAcount(DataSnapshot dataSnapshot) {
+        String count=dataSnapshot.child("QAstart").getValue().toString();
+        Log.d("buttoncount",count);
+        databaseCountReference.child("QAstart").setValue(Integer.toString(Integer.valueOf(count)+1));
+    }
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (FirebaseDatabase.getInstance() != null)
+        {
+            FirebaseDatabase.getInstance().goOnline();
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if(FirebaseDatabase.getInstance()!=null)
+        {
+            FirebaseDatabase.getInstance().goOffline();
+        }
+    }
+
 }

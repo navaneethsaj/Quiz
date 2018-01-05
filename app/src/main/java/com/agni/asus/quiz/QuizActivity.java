@@ -5,12 +5,14 @@ import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Handler;
+import android.support.annotation.NonNull;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Html;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
@@ -19,7 +21,16 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.daasuu.cat.CountAnimationTextView;
-import com.dd.processbutton.iml.ActionProcessButton;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.hanks.htextview.HTextView;
 import com.hanks.htextview.HTextViewType;
 import com.victor.loading.book.BookLoading;
@@ -34,6 +45,7 @@ import java.util.ArrayList;
 import java.util.Random;
 
 import es.dmoral.toasty.Toasty;
+import mehdi.sakout.fancybuttons.FancyButton;
 import nl.dionsegijn.konfetti.KonfettiView;
 import nl.dionsegijn.konfetti.models.Shape;
 import nl.dionsegijn.konfetti.models.Size;
@@ -68,6 +80,10 @@ public class QuizActivity extends AppCompatActivity {
     TextView title,nxt_vw,q_no;
     HTextView cat,diff;
     Random random;
+    DatabaseReference databaseCountReference;
+    FirebaseDatabase database;
+    private FirebaseAuth.AuthStateListener mauthStateListener;
+    private FirebaseAuth mAuth;
     ImageView imageView;
     ImageView img1,img2,img3,img4;
     Spinner spinner1,spinner2;
@@ -76,7 +92,8 @@ public class QuizActivity extends AppCompatActivity {
     TextView optn1,optn2,optn3,optn4;
     SharedPreferences sharedPreferences;
     SharedPreferences.Editor editor;
-    ActionProcessButton next;
+    FancyButton next;
+    ViewGroup viewGroup;
     CountAnimationTextView countAnimationTextView,next_qstn_in;
     KonfettiView konfettiView;
     int current_score=0;
@@ -93,6 +110,41 @@ public class QuizActivity extends AppCompatActivity {
         sharedPreferences=getSharedPreferences(pref_key,MODE_PRIVATE);
         editor=sharedPreferences.edit();
         handler=new Handler();
+
+        mAuth = FirebaseAuth.getInstance();
+        mauthStateListener = new FirebaseAuth.AuthStateListener() {
+            @Override
+            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+                FirebaseUser user = firebaseAuth.getCurrentUser();
+                if (user != null) {
+                    // User is signed in
+                    Log.d("tag", "onAuthStateChanged:signed_in:" + user.getUid());
+                } else {
+                    // User is signed out
+                    Log.d("tag", "onAuthStateChanged:signed_out");
+                }
+
+            }
+        };
+
+        if (mAuth.getCurrentUser() == null){
+            mAuth.signInAnonymously()
+                    .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                        @Override
+                        public void onComplete(@NonNull Task<AuthResult> task) {
+                            Log.d("mauth", "OnComplete : " +task.isSuccessful());
+                            if (!task.isSuccessful()) {
+                                Log.w("mauth", "Failed : ", task.getException());
+                                Toast.makeText(getApplicationContext(), "Authentication failed.", Toast.LENGTH_SHORT).show();
+                            }
+
+
+                        }
+                    });
+        }
+
+        database=FirebaseDatabase.getInstance();
+        databaseCountReference=database.getReference("count");
 
         questionModelArrayList=new ArrayList<>();
         random=new Random();
@@ -112,6 +164,7 @@ public class QuizActivity extends AppCompatActivity {
         tick2.setVisibility(View.GONE);
         tick3.setVisibility(View.GONE);
         tick4.setVisibility(View.GONE);
+        viewGroup=findViewById(R.id.scroll_view);
         imageView=findViewById(R.id.q_mark_imgvw);
         avLoadingIndicatorView=findViewById(R.id.loading_indicator);
         question_view=findViewById(R.id.question_view);
@@ -190,6 +243,7 @@ public class QuizActivity extends AppCompatActivity {
                     next.setText("NEW ROUND");
 
                     imageView.setVisibility(View.INVISIBLE);
+                    viewGroup.setVisibility(View.GONE);
                     optn1.setVisibility(View.GONE);
                     optn2.setVisibility(View.GONE);
                     optn3.setVisibility(View.GONE);
@@ -209,7 +263,7 @@ public class QuizActivity extends AppCompatActivity {
                     if (current_score<10){
                         diff.animateText("Poor. Go to Q&A to practice.");
                     }else if (current_score>=10 && current_score<30){
-                        diff.animateText("Below Average. Change difficulty from top right corner");
+                        diff.animateText("Below Average .Change difficulty from top right corner");
                     }else if (current_score>=30 && current_score<60){
                         diff.animateText("Good");
                     }else if (current_score>=60 && current_score<80){
@@ -314,6 +368,25 @@ public class QuizActivity extends AppCompatActivity {
             }
         });
     }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (FirebaseDatabase.getInstance() != null)
+        {
+            FirebaseDatabase.getInstance().goOnline();
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if(FirebaseDatabase.getInstance()!=null)
+        {
+            FirebaseDatabase.getInstance().goOffline();
+        }
+    }
+
     public class MyAsyncTask extends AsyncTask<String,Void,String> {
 
         @Override
@@ -327,6 +400,7 @@ public class QuizActivity extends AppCompatActivity {
             //previous.setEnabled(false);
             avLoadingIndicatorView.show();
             bookLoading.start();
+            viewGroup.setVisibility(View.GONE);
             final_points.setVisibility(View.INVISIBLE);
             countAnimationTextView.setVisibility(View.INVISIBLE);
             avLoadingIndicatorView.setVisibility(View.VISIBLE);
@@ -386,6 +460,7 @@ public class QuizActivity extends AppCompatActivity {
             optn3.setVisibility(View.VISIBLE);
             optn4.setVisibility(View.VISIBLE);
 
+            viewGroup.setVisibility(View.VISIBLE);
             nxt_vw.setVisibility(View.INVISIBLE);
             next.setText("SKIP");
             next_qstn_in.setVisibility(View.INVISIBLE);
@@ -395,6 +470,20 @@ public class QuizActivity extends AppCompatActivity {
             img2.setVisibility(View.VISIBLE);
             img3.setVisibility(View.VISIBLE);
             img4.setVisibility(View.VISIBLE);
+
+            cat.setVisibility(View.VISIBLE);
+
+            databaseCountReference.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    incrementQuizcount(dataSnapshot);
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            });
 
             //Toast.makeText(getApplicationContext(),json_response,Toast.LENGTH_LONG).show();
             try {
@@ -578,5 +667,10 @@ public class QuizActivity extends AppCompatActivity {
                 optn3.setText(c_pholder+Html.fromHtml(questionModelArrayList.get(i).getIncorrect_answers().get(2)));
                 break;
         }
+    }
+    private void incrementQuizcount(DataSnapshot dataSnapshot) {
+        String count=dataSnapshot.child("quizStart").getValue().toString();
+        Log.d("buttoncount",count);
+        databaseCountReference.child("quizStart").setValue(Integer.toString(Integer.valueOf(count)+1));
     }
 }

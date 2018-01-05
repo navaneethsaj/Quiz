@@ -24,6 +24,7 @@ dependencies {
     implementation 'com.android.support.constraint:constraint-layout:1.0.2'
     implementation 'com.google.firebase:firebase-database:11.0.4'
     implementation 'com.google.firebase:firebase-auth:11.0.4'
+    compile 'com.google.android.gms:play-services-ads:11.0.4'
     testImplementation 'junit:junit:4.12'
     compile 'com.android.support:design:26.1.0'
     compile 'com.skyfishjy.ripplebackground:library:1.0.1'
@@ -37,6 +38,8 @@ dependencies {
     compile 'com.victor:lib:1.0.4'
     compile 'com.github.GrenderG:Toasty:1.2.8'
     compile 'nl.dionsegijn:konfetti:1.1.0'
+    compile 'com.github.deano2390:MaterialShowcaseView:1.2.0'
+    compile 'com.github.medyo:fancybuttons:1.8.4'
     androidTestImplementation 'com.android.support.test:runner:1.0.1'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
 }

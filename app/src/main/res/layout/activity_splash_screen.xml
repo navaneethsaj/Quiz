@@ -4,18 +4,33 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/colorPrimary"
     tools:context="com.agni.asus.quiz.SplashScreen">
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_above="@+id/textView2"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="154dp"
+        android:fontFamily="casual"
+        android:text="QUIZ"
+        android:textAllCaps="false"
+        android:textAppearance="@style/TextAppearance.AppCompat.Headline"
+        android:textColor="@color/book_loading_background"
+        android:textSize="60sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/textView2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_above="@+id/loading_counter"
         android:layout_centerHorizontal="true"
-        android:layout_marginBottom="15dp"
         android:fontFamily="serif"
         android:text="Loading"
         android:textAppearance="@style/TextAppearance.AppCompat.Headline"
-        android:id="@+id/textView2" />
+        android:textColor="@color/book_loading_background" />
 
     <com.daasuu.cat.CountAnimationTextView
         android:id="@+id/loading_counter"
@@ -26,7 +41,8 @@
         android:layout_marginBottom="81dp"
         android:fontFamily="serif"
         android:text="100"
-        android:textAppearance="@style/TextAppearance.AppCompat.Headline" />
+        android:textAppearance="@style/TextAppearance.AppCompat.Headline"
+        android:textColor="@color/book_loading_background" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -36,14 +52,7 @@
         android:layout_toEndOf="@+id/loading_counter"
         android:fontFamily="serif"
         android:text="%"
-        android:textAppearance="@style/TextAppearance.AppCompat.Headline" />
+        android:textAppearance="@style/TextAppearance.AppCompat.Headline"
+        android:textColor="@color/book_loading_background" />
 
-    <ImageView
-        android:id="@+id/imageView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/textView2"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="64dp"
-        android:src="@drawable/icon" />
 </RelativeLayout>

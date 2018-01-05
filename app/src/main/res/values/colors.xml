@@ -13,9 +13,10 @@
     <color name="primary_text">#212121</color>
     <color name="secondary_text">#757575</color>
     <color name="icons">#FFFFFF</color>
-    <color name="divider">#BDBDBD</color>
+    <color name="divider">#D32F2F</color>
     <color name="button_normal">#F44336</color>
     <color name="button_pressed">#D32F2F</color>
     <color name="spinner_text">#757575</color>
     <color name="avloading">#D32F2F</color>
+    <color name="viewcolor">#ffffff</color>
 </resources>

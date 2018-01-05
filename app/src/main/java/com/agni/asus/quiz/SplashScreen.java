@@ -24,7 +24,7 @@ public class SplashScreen extends AppCompatActivity {
         load_counter=findViewById(R.id.loading_counter);
         sharedPreferences=getSharedPreferences(pref_key,MODE_PRIVATE);
         editor=sharedPreferences.edit();
-        load_counter.setAnimationDuration(1000).countAnimation(0,100);
+        load_counter.setAnimationDuration(1600).countAnimation(0,100);
         new Handler().postDelayed(new Runnable() {
 
             @Override
@@ -41,9 +41,9 @@ public class SplashScreen extends AppCompatActivity {
                     Intent i = new Intent(SplashScreen.this, MainActivity.class);
                     startActivity(i);
                     finish();
-                    overridePendingTransition(R.anim.slide_up_in, R.anim.slide_down_out);
+                    overridePendingTransition(R.anim.zoom_in,R.anim.fadeout);
                 }
             }
-        }, 1000);
+        }, 1700);
     }
 }
